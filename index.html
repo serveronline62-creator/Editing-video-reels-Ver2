@@ -35,7 +35,9 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    /* dvh dengan fallback vh untuk browser lama */
     .app {
+      height: 100vh;
       height: 100dvh;
       display: flex;
       align-items: center;
@@ -45,7 +47,9 @@
     .phone-frame {
       position: relative;
       width: 100vw;
+      height: 100vh;
       height: 100dvh;
+      max-width: calc(100vh * 9 / 16);
       max-width: calc(100dvh * 9 / 16);
       background: #000;
       display: flex;
@@ -53,7 +57,6 @@
       overflow: hidden;
     }
 
-    /* ============ SCREENS ============ */
     .screen {
       position: relative;
       flex: 1 1 0;
@@ -65,12 +68,9 @@
       justify-content: center;
     }
 
-    /* ==== PROPORSI LAYAR 30% : 70% ====
-       Atas  : 3  (30%)
-       Bawah : 7  (70%)  → layar upload lebih tinggi
-       Kalau diubah, SPLIT_TOP_RATIO di JS juga harus diubah! */
-    .screen-live   { flex: 3 1 0; }
-    .screen-upload { flex: 7 1 0; }
+    /* Rasio 40 : 60 — diukur ulang di JS supaya konsisten */
+    .screen-live   { flex: 0.8 1 0; }
+    .screen-upload { flex: 1.2 1 0; }
 
     .screen video {
       width: 100%; height: 100%;
@@ -85,7 +85,6 @@
       z-index: 3;
     }
 
-    /* ============ BADGES ============ */
     .badge {
       position: absolute;
       top: 12px;
@@ -118,7 +117,6 @@
       50%      { opacity: 0.4; transform: scale(0.8); }
     }
 
-    /* ============ REC BADGE ============ */
     .rec-badge {
       position: absolute;
       top: calc(12px + var(--safe-top));
@@ -149,7 +147,6 @@
       animation: pulseDot 1s ease-in-out infinite;
     }
 
-    /* ============ PLACEHOLDER ============ */
     .placeholder {
       position: absolute;
       inset: 0;
@@ -175,7 +172,6 @@
     }
     .placeholder.hidden { opacity: 0; }
 
-    /* ============ VIDEO PROGRESS ============ */
     .video-progress {
       position: absolute;
       bottom: 0; left: 0; right: 0;
@@ -194,7 +190,6 @@
       box-shadow: 0 0 8px rgba(99,102,241,0.6);
     }
 
-    /* ============ CONTROL PANEL ============ */
     .control-panel {
       flex: 0 0 auto;
       background: var(--panel);
@@ -213,10 +208,8 @@
       gap: 8px;
     }
 
-    /* Playback circular */
     .circle-btn {
-      width: 42px;
-      height: 42px;
+      width: 42px; height: 42px;
       border-radius: 50%;
       border: 1px solid var(--border);
       background: var(--surface);
@@ -232,15 +225,13 @@
     .circle-btn:disabled { opacity: 0.3; pointer-events: none; }
     .circle-btn:hover { background: var(--surface-hover); }
     .circle-btn.primary {
-      width: 52px;
-      height: 52px;
+      width: 52px; height: 52px;
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
       border-color: transparent;
       box-shadow: 0 4px 16px rgba(99,102,241,0.4);
     }
     .circle-btn.primary svg { width: 22px; height: 22px; }
 
-    /* Action pills */
     .pill {
       padding: 8px 12px;
       border-radius: 12px;
@@ -265,13 +256,8 @@
       border-color: rgba(16,185,129,0.4);
       color: var(--green);
     }
-    .pill.icon-only {
-      padding: 8px;
-      width: 34px;
-      justify-content: center;
-    }
+    .pill.icon-only { padding: 8px; width: 34px; justify-content: center; }
 
-    /* Record button */
     .record-btn {
       width: 100%;
       padding: 14px;
@@ -294,8 +280,7 @@
     .record-btn:active { transform: scale(0.97); }
     .record-btn:disabled { opacity: 0.5; pointer-events: none; }
     .record-btn .rec-indicator {
-      width: 14px;
-      height: 14px;
+      width: 14px; height: 14px;
       border-radius: 50%;
       background: #fff;
       transition: border-radius 0.25s;
@@ -314,7 +299,6 @@
 
     input[type="file"] { display: none; }
 
-    /* ============ MODAL ============ */
     .modal {
       position: fixed;
       inset: 0;
@@ -362,8 +346,7 @@
       background: var(--surface);
       border: none;
       color: var(--muted);
-      width: 32px;
-      height: 32px;
+      width: 32px; height: 32px;
       border-radius: 50%;
       cursor: pointer;
       display: inline-flex;
@@ -422,7 +405,6 @@
       border: 1px solid var(--border);
     }
 
-    /* ============ TOAST ============ */
     .toast {
       position: fixed;
       bottom: calc(220px + var(--safe-bottom));
@@ -448,7 +430,6 @@
     .toast.error { background: rgba(239,68,68,0.95); }
     .toast.success { background: rgba(16,185,129,0.95); }
 
-    /* ============ LOADER ============ */
     .loader {
       position: absolute;
       inset: 0;
@@ -466,8 +447,7 @@
     }
     .loader.show { display: flex; }
     .spinner {
-      width: 40px;
-      height: 40px;
+      width: 40px; height: 40px;
       border: 3px solid rgba(255,255,255,0.15);
       border-top-color: var(--accent);
       border-radius: 50%;
@@ -477,7 +457,6 @@
 
     .hidden { display: none !important; }
 
-    /* ============ RESPONSIVE ============ */
     @media (max-height: 700px) {
       .control-panel { padding: 8px 12px calc(8px + var(--safe-bottom)); gap: 8px; }
       .circle-btn { width: 38px; height: 38px; }
@@ -492,7 +471,6 @@
 <div class="app">
   <div class="phone-frame">
 
-    <!-- ===== TOP SCREEN: LIVE (30%) ===== -->
     <div class="screen screen-live">
       <span class="badge live">
         <span class="dot"></span>
@@ -510,7 +488,6 @@
 
     <div class="divider"></div>
 
-    <!-- ===== BOTTOM SCREEN: UPLOAD (70%, lebih tinggi) ===== -->
     <div class="screen screen-upload">
       <span class="badge upload">
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
@@ -520,30 +497,27 @@
         </svg>
         UPLOAD
       </span>
-      <video id="uploadVideo" playsinline loop></video>
+      <video id="uploadVideo" playsinline loop preload="metadata"></video>
       <div class="placeholder" id="uploadPlaceholder">
         <svg viewBox="0 0 24 24">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
           <polyline points="17 8 12 3 7 8"/>
           <line x1="12" y1="3" x2="12" y2="15"/>
         </svg>
-        <span>Upload video dulu</span>
+        <span>Upload video dari galeri HP</span>
       </div>
       <div class="video-progress" id="videoProgress">
         <div class="video-progress-fill" id="videoProgressFill"></div>
       </div>
     </div>
 
-    <!-- ===== REC BADGE ===== -->
     <div class="rec-badge" id="recBadge">
       <span class="rec-dot"></span>
       <span id="recTimer">00:00</span>
     </div>
 
-    <!-- ===== CONTROL PANEL ===== -->
     <div class="control-panel">
 
-      <!-- Playback -->
       <div class="ctrl-row">
         <button class="circle-btn" id="btnBack" title="Mundur 5 detik">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
@@ -559,7 +533,6 @@
         </button>
       </div>
 
-      <!-- Actions -->
       <div class="ctrl-row">
         <button class="pill" id="btnStartCam">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -606,7 +579,6 @@
         </button>
       </div>
 
-      <!-- Record -->
       <button class="record-btn" id="btnRecord">
         <span class="rec-indicator"></span>
         <span class="rec-text">Mulai Rekam</span>
@@ -614,7 +586,6 @@
 
     </div>
 
-    <!-- ===== LOADER ===== -->
     <div class="loader" id="loader">
       <div class="spinner"></div>
       <span id="loaderText">Memproses...</span>
@@ -623,9 +594,9 @@
   </div>
 </div>
 
+<!-- accept="video/*" tanpa capture → buka galeri di HP -->
 <input type="file" id="fileInput" accept="video/*" />
 
-<!-- ===== PREVIEW MODAL ===== -->
 <div class="modal" id="previewModal">
   <div class="modal-card">
     <div class="modal-header">
@@ -667,20 +638,13 @@
    KONFIGURASI
    ============================================================ */
 const QUALITY_PRESETS = {
-  '480':  { w: 540,  h: 960,  bitrate: 2_000_000, label: 'SD'  },
-  '720':  { w: 720,  h: 1280, bitrate: 4_000_000, label: 'HD'  },
-  '1080': { w: 1080, h: 1920, bitrate: 8_000_000, label: 'FHD' }
+  '480':  { w: 540,  bitrate: 2_000_000, label: 'SD'  },
+  '720':  { w: 720,  bitrate: 4_000_000, label: 'HD'  },
+  '1080': { w: 1080, bitrate: 8_000_000, label: 'FHD' }
 };
 const QUALITY_ORDER = ['480', '720', '1080'];
 const SEEK_STEP = 5;
-
-/* Proporsi layar ATAS pada hasil rekaman.
-   HARUS SAMA dengan CSS:
-     .screen-live   { flex: 3 1 0; }
-     .screen-upload { flex: 7 1 0; }
-   → 3 / (3 + 7) = 0.30
-   Kalau nilai CSS diubah, ubah angka ini juga. */
-const SPLIT_TOP_RATIO = 0.30;
+const DEFAULT_SPLIT = 0.40; // fallback kalau DOM belum siap
 
 /* ============================================================
    STATE
@@ -693,6 +657,7 @@ const state = {
   mediaRecorder: null, recordedChunks: [], recDest: null,
   recStartTime: 0, timerInterval: null, drawRAF: null,
   quality: '720',
+  splitRatio: DEFAULT_SPLIT,
   previewBlob: null, previewUrl: null, previewMime: ''
 };
 
@@ -725,7 +690,6 @@ const btnDownload       = $('btnDownload');
 const qualityLabel      = $('qualityLabel');
 const recText           = btnRecord.querySelector('.rec-text');
 
-/* Playback */
 const btnPlayPause      = $('btnPlayPause');
 const btnBack           = $('btnBack');
 const btnNext           = $('btnNext');
@@ -733,21 +697,48 @@ const btnStop           = $('btnStop');
 const videoProgress     = $('videoProgress');
 const videoProgressFill = $('videoProgressFill');
 
-/* SVG icons untuk play/pause */
+const phoneFrame        = document.querySelector('.phone-frame');
+const liveScreen        = document.querySelector('.screen-live');
+const uploadScreen      = document.querySelector('.screen-upload');
+
 const ICON_PLAY  = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
 const ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>';
 
 /* ============================================================
-   CANVAS
+   CANVAS — DINAMIS MENGIKUTI LAYAR HP
    ============================================================ */
 const canvas = document.createElement('canvas');
 const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
 
+/* Ukur rasio area screen (bukan phone-frame, karena panel kontrol
+   TIDAK ikut direkam). liveScreen + uploadScreen = area rekaman. */
+function getLayoutMetrics() {
+  const liveRect = liveScreen.getBoundingClientRect();
+  const uploadRect = uploadScreen.getBoundingClientRect();
+  const frameRect = phoneFrame.getBoundingClientRect();
+
+  const liveH = liveRect.height;
+  const uploadH = uploadRect.height;
+  const screensH = liveH + uploadH;
+  const screensW = frameRect.width;
+
+  const aspect = (screensW > 0 && screensH > 0) ? (screensH / screensW) : (16 / 9);
+  const split = (screensH > 0) ? (liveH / screensH) : DEFAULT_SPLIT;
+
+  return { aspect, split };
+}
+
 function applyQuality(q) {
   const p = QUALITY_PRESETS[q];
+  const { aspect, split } = getLayoutMetrics();
+
+  // Lebar tetap sesuai preset, tinggi mengikuti rasio layar HP.
+  // Dibulatkan ke angka genap agar codec tidak error.
   canvas.width = p.w;
-  canvas.height = p.h;
+  canvas.height = Math.max(2, Math.round((p.w * aspect) / 2) * 2);
+
   state.quality = q;
+  state.splitRatio = split;
   qualityLabel.textContent = p.label;
 }
 
@@ -777,19 +768,14 @@ function startDrawLoop() {
   if (state.drawRAF) return;
   const tick = () => {
     const W = canvas.width, H = canvas.height;
-    /* Garis pemisah mengikuti proporsi layar 30/70 */
-    const splitY = Math.round(H * SPLIT_TOP_RATIO);
+    const splitY = Math.round(H * state.splitRatio);
 
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, W, H);
 
-    /* Layar atas: LIVE (30%) */
     drawCover(liveVideo,   0, 0,      W, splitY);
-
-    /* Layar bawah: UPLOAD (70%, lebih tinggi) */
     drawCover(uploadVideo, 0, splitY, W, H - splitY);
 
-    /* Garis pemisah */
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
     ctx.fillRect(0, splitY - 1, W, 2);
 
@@ -831,10 +817,17 @@ function updateProgressBar() {
   videoProgressFill.style.width = (uploadVideo.currentTime / dur * 100) + '%';
 }
 
-function togglePlayPause() {
+async function togglePlayPause() {
   if (!state.uploadReady) { showToast('Upload video dulu', 'error'); return; }
+  ensureAudioCtx(); // resume audio (user gesture)
   if (uploadVideo.paused) {
-    uploadVideo.play().catch(err => showToast('Gagal play: ' + err.message, 'error'));
+    // Unmute pada gesture user — supaya audio ikut ke-rekam & kedengaran
+    uploadVideo.muted = false;
+    try {
+      await uploadVideo.play();
+    } catch (err) {
+      showToast('Gagal play: ' + err.message, 'error');
+    }
   } else {
     uploadVideo.pause();
   }
@@ -935,15 +928,34 @@ async function toggleMic() {
    AUDIO CONTEXT
    ============================================================ */
 function ensureAudioCtx() {
-  if (!state.audioCtx) state.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  if (state.audioCtx.state === 'suspended') state.audioCtx.resume().catch(() => {});
+  if (!state.audioCtx) {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    state.audioCtx = new AC();
+  }
+  if (state.audioCtx.state === 'suspended') {
+    state.audioCtx.resume().catch(() => {});
+  }
   return state.audioCtx;
 }
 
+/* Auto-resume audio context pada interaksi pertama — penting di iOS/Android */
+['click', 'touchstart', 'keydown'].forEach(evt => {
+  document.addEventListener(evt, () => {
+    if (state.audioCtx && state.audioCtx.state === 'suspended') {
+      state.audioCtx.resume().catch(() => {});
+    }
+  }, { passive: true });
+});
+
 /* ============================================================
-   UPLOAD
+   UPLOAD — support galeri HP
    ============================================================ */
-btnUpload.addEventListener('click', () => fileInput.click());
+btnUpload.addEventListener('click', () => {
+  // Reset value dulu supaya file yang sama bisa dipilih ulang
+  fileInput.value = '';
+  fileInput.click();
+});
 
 fileInput.addEventListener('change', async (e) => {
   const file = e.target.files[0];
@@ -954,26 +966,44 @@ fileInput.addEventListener('change', async (e) => {
   try {
     const url = URL.createObjectURL(file);
     uploadVideo.src = url;
-    uploadVideo.muted = false;
-    uploadVideo.volume = 1;
+    uploadVideo.load();
 
     await new Promise((resolve, reject) => {
-      uploadVideo.onloadedmetadata = resolve;
-      uploadVideo.onerror = () => reject(new Error('Gagal memuat video'));
+      const done = () => { uploadVideo.onloadedmetadata = null; uploadVideo.onerror = null; resolve(); };
+      const fail = () => { uploadVideo.onloadedmetadata = null; uploadVideo.onerror = null; reject(new Error('Gagal memuat video')); };
+      uploadVideo.onloadedmetadata = done;
+      uploadVideo.onerror = fail;
+      // Timeout safety 15 detik
+      setTimeout(() => { if (!state.uploadReady && uploadVideo.readyState < 1) fail(); }, 15000);
     });
 
     uploadPlaceholder.classList.add('hidden');
     state.uploadReady = true;
 
     ensureAudioCtx();
-    if (!state.uploadSource) {
-      state.uploadSource = state.audioCtx.createMediaElementSource(uploadVideo);
-      state.uploadSource.connect(state.audioCtx.destination);
+    try {
+      if (!state.uploadSource) {
+        state.uploadSource = state.audioCtx.createMediaElementSource(uploadVideo);
+        state.uploadSource.connect(state.audioCtx.destination);
+      }
+    } catch (e) {
+      console.warn('Audio routing gagal:', e);
     }
 
-    uploadVideo.play().catch(() => {});
+    // Coba autoplay unmuted (works setelah gesture file-picker di banyak Android)
+    // Fallback: mute + autoplay supaya user tetap lihat video jalan.
+    try {
+      uploadVideo.muted = false;
+      await uploadVideo.play();
+      showToast('Video berhasil dimuat', 'success');
+    } catch (autoplayErr) {
+      uploadVideo.muted = true;
+      try { await uploadVideo.play(); } catch(e) {}
+      showToast('Video dimuat — ketuk ▶ untuk audio', '');
+    }
+
     updatePlayPauseIcon();
-    showToast('Video berhasil dimuat', 'success');
+    updateProgressBar();
   } catch (err) {
     showToast('Gagal: ' + err.message, 'error');
   } finally {
@@ -991,6 +1021,9 @@ async function startRecording() {
   if (typeof canvas.captureStream !== 'function') { showToast('Browser tidak mendukung captureStream', 'error'); return; }
 
   ensureAudioCtx();
+
+  // Kunci ukuran canvas sesuai layout layar SAAT INI
+  applyQuality(state.quality);
 
   const videoStream = canvas.captureStream(30);
   const tracks = [...videoStream.getVideoTracks()];
@@ -1179,18 +1212,39 @@ btnClosePreview.addEventListener('click', closePreview);
 btnSaveGallery.addEventListener('click', saveToGallery);
 btnDownload.addEventListener('click', downloadFile);
 
-window.addEventListener('beforeunload', () => {
+/* ============================================================
+   RESIZE / ORIENTATION — sinkron ulang canvas
+   ============================================================ */
+let resizeTimeout;
+function handleResize() {
+  if (state.isRecording) return; // jangan resize saat merekam
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => {
+    applyQuality(state.quality);
+  }, 150);
+}
+window.addEventListener('resize', handleResize);
+window.addEventListener('orientationchange', handleResize);
+
+/* ============================================================
+   CLEANUP
+   ============================================================ */
+function cleanup() {
   if (state.stream) state.stream.getTracks().forEach(t => t.stop());
   if (state.micStream) state.micStream.getTracks().forEach(t => t.stop());
   if (state.isRecording) stopRecording();
-});
+}
+window.addEventListener('pagehide', cleanup);
+window.addEventListener('beforeunload', cleanup);
 
 /* ============================================================
    INIT
    ============================================================ */
 applyQuality('720');
+// re-measure setelah layout final (font, safe-area, dll)
+requestAnimationFrame(() => applyQuality(state.quality));
 updatePlayPauseIcon();
-console.log('%c📱 Split Screen Recorder — Modern UI (30/70)', 'color:#6366f1;font-weight:bold;font-size:14px');
+console.log('%c📱 Split Screen Recorder — Auto-fit layar HP', 'color:#6366f1;font-weight:bold;font-size:14px');
 </script>
 
 </body>
