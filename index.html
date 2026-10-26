@@ -75,11 +75,61 @@
       object-fit: cover;
       background: #000;
       display: block;
-      /* dipakai untuk auto-zoom / auto-pan mengikuti wajah */
-      transform-origin: center center;
-      will-change: transform;
-      backface-visibility: hidden;
     }
+
+    /* ====== VIDEO UPLOAD: bisa digeser manual ====== */
+    .screen-upload video {
+      object-position: 50% 50%;
+      touch-action: none;         /* supaya drag tidak memicu scroll/gesture */
+      cursor: grab;
+      will-change: object-position;
+    }
+    .screen-upload video.grabbing { cursor: grabbing; }
+
+    .pan-reset {
+      position: absolute;
+      right: 10px;
+      bottom: 12px;
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 7;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: transform 0.15s, background 0.2s, opacity 0.2s;
+    }
+    .pan-reset svg { width: 16px; height: 16px; }
+    .pan-reset:active { transform: scale(0.9); }
+    .pan-reset:hover { background: rgba(0,0,0,0.75); }
+
+    .pan-hint {
+      position: absolute;
+      right: 10px;
+      bottom: 54px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      color: #fff;
+      background: rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 7;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    .pan-hint.show { opacity: 1; transform: translateY(0); }
+    /* =============================================== */
 
     .divider {
       flex: 0 0 2px;
@@ -208,7 +258,6 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      flex-wrap: wrap;
     }
 
     .circle-btn {
@@ -247,7 +296,7 @@
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      transition: transform 0.15s, background 0.2s, opacity 0.2s, border-color 0.2s, color 0.2s;
+      transition: transform 0.15s, background 0.2s, opacity 0.2s;
       white-space: nowrap;
     }
     .pill svg { width: 14px; height: 14px; }
@@ -259,25 +308,7 @@
       border-color: rgba(16,185,129,0.4);
       color: var(--green);
     }
-    .pill.active-face {
-      background: rgba(99,102,241,0.15);
-      border-color: rgba(99,102,241,0.45);
-      color: #a5b4fc;
-    }
     .pill.icon-only { padding: 8px; width: 34px; justify-content: center; }
-
-    /* indikator kecil: hijau = wajah terdeteksi */
-    .face-dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.25);
-      transition: background 0.2s, box-shadow 0.2s;
-      flex: 0 0 auto;
-    }
-    .pill.has-face .face-dot {
-      background: var(--green);
-      box-shadow: 0 0 8px rgba(16,185,129,0.85);
-    }
 
     .record-btn {
       width: 100%;
@@ -509,7 +540,7 @@
 
     <div class="divider"></div>
 
-    <div class="screen screen-upload">
+    <div class="screen screen-upload" id="uploadScreen">
       <span class="badge upload">
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -525,8 +556,23 @@
           <polyline points="17 8 12 3 7 8"/>
           <line x1="12" y1="3" x2="12" y2="15"/>
         </svg>
-        <span>Upload video dari galeri HP</span>
+        <span>Upload video dari galeri HP<br>lalu geser untuk atur posisi</span>
       </div>
+
+      <!-- HINT GESER -->
+      <div class="pan-hint" id="panHint">✋ Geser untuk atur posisi</div>
+
+      <!-- RESET POSISI -->
+      <button class="pan-reset hidden" id="btnResetPan" title="Reset posisi video">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <line x1="12" y1="2" x2="12" y2="6"/>
+          <line x1="12" y1="18" x2="12" y2="22"/>
+          <line x1="2" y1="12" x2="6" y2="12"/>
+          <line x1="18" y1="12" x2="22" y2="12"/>
+        </svg>
+      </button>
+
       <div class="video-progress" id="videoProgress">
         <div class="video-progress-fill" id="videoProgressFill"></div>
       </div>
@@ -597,16 +643,6 @@
             <line x1="17" y1="16" x2="23" y2="16"/>
           </svg>
           <span id="qualityLabel">HD</span>
-        </button>
-        <button class="pill active-face" id="btnFace" title="Auto fokus wajah pada video upload">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="9"/>
-            <path d="M8.5 14.2s1.3 1.9 3.5 1.9 3.5-1.9 3.5-1.9"/>
-            <line x1="9" y1="9.6" x2="9.01" y2="9.6"/>
-            <line x1="15" y1="9.6" x2="15.01" y2="9.6"/>
-          </svg>
-          Wajah
-          <span class="face-dot"></span>
         </button>
       </div>
 
@@ -688,18 +724,9 @@ const state = {
   recStartTime: 0, timerInterval: null, drawRAF: null,
   quality: '720',
   splitRatio: DEFAULT_SPLIT,
-  previewBlob: null, previewUrl: null, previewMime: '',
-
-  /* ---- face tracking ---- */
-  faceMode: true,          // auto fokus wajah aktif?
-  faceDetector: null,      // native FaceDetector (kalau browser mendukung)
-  faceFound: false,
-  crop: null,              // crop aktif (sudah di-smooth)  { cx, cy, h }
-  cropTarget: null,        // crop tujuan                  { cx, cy, h }
-  faceRAF: null,
-  detecting: false,
-  lastDetect: 0,
-  lastFaceSeen: 0
+  /* Posisi manual video upload (0..1). 0.5 = tengah */
+  uploadPos: { x: 0.5, y: 0.5 },
+  previewBlob: null, previewUrl: null, previewMime: ''
 };
 
 /* ============================================================
@@ -715,7 +742,6 @@ const btnSwitchCam      = $('btnSwitchCam');
 const btnMic            = $('btnMic');
 const btnUpload         = $('btnUpload');
 const btnQuality        = $('btnQuality');
-const btnFace           = $('btnFace');
 const btnRecord         = $('btnRecord');
 const fileInput         = $('fileInput');
 const recBadge          = $('recBadge');
@@ -731,6 +757,8 @@ const btnSaveGallery    = $('btnSaveGallery');
 const btnDownload       = $('btnDownload');
 const qualityLabel      = $('qualityLabel');
 const recText           = btnRecord.querySelector('.rec-text');
+const btnResetPan       = $('btnResetPan');
+const panHint           = $('panHint');
 
 const btnPlayPause      = $('btnPlayPause');
 const btnBack           = $('btnBack');
@@ -744,7 +772,7 @@ const liveScreen        = document.querySelector('.screen-live');
 const uploadScreen      = document.querySelector('.screen-upload');
 
 /* Kontrol yang di-disable selama recording (kontrol "berbahaya") */
-const RECORD_LOCKED_BTNS = [btnStartCam, btnSwitchCam, btnMic, btnUpload, btnQuality, btnFace];
+const RECORD_LOCKED_BTNS = [btnStartCam, btnSwitchCam, btnMic, btnUpload, btnQuality];
 
 /* Kontrol yang TETAP AKTIF selama recording (playback) */
 const RECORD_ACTIVE_BTNS = [btnPlayPause, btnBack, btnNext, btnStop];
@@ -787,25 +815,148 @@ function applyQuality(q) {
 }
 
 /* ============================================================
-   DRAW COVER
+   POSISI MANUAL VIDEO UPLOAD (PAN / GESER)
    ============================================================ */
-function drawCover(video, dx, dy, dw, dh) {
+
+/* Terapkan posisi ke elemen <video> (object-position) */
+function applyUploadPosition() {
+  const p = state.uploadPos;
+  uploadVideo.style.objectPosition = `${(p.x * 100).toFixed(3)}% ${(p.y * 100).toFixed(3)}%`;
+}
+
+function resetUploadPosition(silent = false) {
+  state.uploadPos.x = 0.5;
+  state.uploadPos.y = 0.5;
+  applyUploadPosition();
+  if (!silent) showToast('↺ Posisi video direset ke tengah');
+}
+
+/* Hitung sisa ruang (overflow) akibat object-fit: cover.
+   Nilai > 0 berarti sumbu tersebut masih bisa digeser. */
+function getCoverOverflow(video, w, h) {
+  const vw = video.videoWidth, vh = video.videoHeight;
+  if (!vw || !vh || !w || !h) return null;
+  const scale = Math.max(w / vw, h / vh);
+  return {
+    x: Math.max(0, vw * scale - w),
+    y: Math.max(0, vh * scale - h)
+  };
+}
+
+const clamp01 = v => Math.min(1, Math.max(0, v));
+
+let pan = null;   // { pointerId, startX, startY, baseX, baseY, ovX, ovY }
+
+function onPanDown(e) {
+  if (!state.uploadReady) return;
+  if (e.button !== undefined && e.button !== 0 && e.pointerType === 'mouse') return;
+
+  const rect = uploadVideo.getBoundingClientRect();
+  const ov = getCoverOverflow(uploadVideo, rect.width, rect.height);
+  if (!ov) return;
+  if (ov.x <= 0.5 && ov.y <= 0.5) return;   // video sudah pas, tidak perlu digeser
+
+  pan = {
+    pointerId: e.pointerId,
+    startX: e.clientX,
+    startY: e.clientY,
+    baseX: state.uploadPos.x,
+    baseY: state.uploadPos.y,
+    ovX: ov.x,
+    ovY: ov.y
+  };
+
+  try { uploadVideo.setPointerCapture(e.pointerId); } catch (err) {}
+  uploadVideo.classList.add('grabbing');
+  hidePanHint();
+  e.preventDefault();
+}
+
+function onPanMove(e) {
+  if (!pan || e.pointerId !== pan.pointerId) return;
+
+  const dx = e.clientX - pan.startX;
+  const dy = e.clientY - pan.startY;
+
+  /* Geser ke kanan  -> konten ikut ke kanan -> object-position X mengecil */
+  const nx = pan.ovX > 0.5 ? pan.baseX - (dx / pan.ovX) : 0.5;
+  const ny = pan.ovY > 0.5 ? pan.baseY - (dy / pan.ovY) : 0.5;
+
+  state.uploadPos.x = clamp01(nx);
+  state.uploadPos.y = clamp01(ny);
+  applyUploadPosition();
+
+  e.preventDefault();
+}
+
+function onPanUp(e) {
+  if (!pan) return;
+  if (e && e.pointerId !== undefined && e.pointerId !== pan.pointerId) return;
+  try { uploadVideo.releasePointerCapture(pan.pointerId); } catch (err) {}
+  pan = null;
+  uploadVideo.classList.remove('grabbing');
+}
+
+uploadVideo.addEventListener('pointerdown', onPanDown);
+uploadVideo.addEventListener('pointermove', onPanMove);
+uploadVideo.addEventListener('pointerup', onPanUp);
+uploadVideo.addEventListener('pointercancel', onPanUp);
+uploadVideo.addEventListener('lostpointercapture', onPanUp);
+
+/* Double-tap / double-click pada video = reset posisi */
+let lastTapTime = 0;
+uploadVideo.addEventListener('pointerup', (e) => {
+  if (!state.uploadReady) return;
+  const now = Date.now();
+  if (now - lastTapTime < 300) {
+    resetUploadPosition();
+    lastTapTime = 0;
+  } else {
+    lastTapTime = now;
+  }
+});
+
+btnResetPan.addEventListener('click', (e) => {
+  e.stopPropagation();
+  resetUploadPosition();
+});
+
+/* Hint kecil "geser" muncul sebentar setelah upload */
+let panHintTimer;
+function showPanHint() {
+  panHint.classList.add('show');
+  clearTimeout(panHintTimer);
+  panHintTimer = setTimeout(hidePanHint, 3200);
+}
+function hidePanHint() {
+  clearTimeout(panHintTimer);
+  panHint.classList.remove('show');
+}
+
+/* ============================================================
+   DRAW COVER (mengikuti posisi manual)
+   ============================================================ */
+function drawCover(video, dx, dy, dw, dh, posX = 0.5, posY = 0.5) {
   if (!video || !video.videoWidth || !video.videoHeight) {
     ctx.fillStyle = '#0d0d0f';
     ctx.fillRect(dx, dy, dw, dh);
     return;
   }
   const vw = video.videoWidth, vh = video.videoHeight;
-  const srcRatio = vw / vh, dstRatio = dw / dh;
-  let sx, sy, sw, sh;
-  if (srcRatio > dstRatio) {
-    sh = vh; sw = vh * dstRatio;
-    sx = (vw - sw) / 2; sy = 0;
-  } else {
-    sw = vw; sh = vw / dstRatio;
-    sx = 0; sy = (vh - sh) / 2;
-  }
-  try { ctx.drawImage(video, sx, sy, sw, sh, dx, dy, dw, dh); } catch(e) {}
+
+  /* Sama persis dengan logika object-fit: cover + object-position */
+  const scale = Math.max(dw / vw, dh / vh);
+  const dispW = vw * scale;
+  const dispH = vh * scale;
+  const overX = Math.max(0, dispW - dw);
+  const overY = Math.max(0, dispH - dh);
+
+  const sw = Math.min(vw, dw / scale);
+  const sh = Math.min(vh, dh / scale);
+  const sx = (posX * overX) / scale;
+  const sy = (posY * overY) / scale;
+
+  try { ctx.drawImage(video, sx, sy, sw, sh, dx, dy, dw, dh); } catch (e) {}
 }
 
 function startDrawLoop() {
@@ -817,9 +968,14 @@ function startDrawLoop() {
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, W, H);
 
-    drawCover(liveVideo, 0, 0, W, splitY);
-    /* video upload digambar mengikuti wajah (auto framing) */
-    drawFaceAware(uploadVideo, 0, splitY, W, H - splitY);
+    /* LIVE — selalu tengah */
+    drawCover(liveVideo, 0, 0, W, splitY, 0.5, 0.5);
+
+    /* UPLOAD — pakai posisi manual dari user */
+    drawCover(
+      uploadVideo, 0, splitY, W, H - splitY,
+      state.uploadPos.x, state.uploadPos.y
+    );
 
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
     ctx.fillRect(0, splitY - 1, W, 2);
@@ -831,281 +987,6 @@ function startDrawLoop() {
 function stopDrawLoop() {
   if (state.drawRAF) cancelAnimationFrame(state.drawRAF);
   state.drawRAF = null;
-}
-
-/* ============================================================
-   AUTO FOKUS WAJAH  (FACE TRACKING)
-   ============================================================
-   Cara kerja:
-   1. Setiap ±130ms frame video upload dianalisis untuk mencari wajah.
-      - Utama  : Shape Detection API (FaceDetector) — Chrome Android.
-      - Cadangan: detektor warna kulit (skin-tone) berbasis piksel.
-   2. Hasil deteksi → titik tengah + ukuran crop.
-   3. Nilai crop di-smooth (lerp) supaya kamera bergerak halus.
-   4. Crop dipakai di DUA tempat agar layar & hasil rekaman sama:
-      - CSS transform pada <video> (tampilan di layar)
-      - drawImage source-rect pada canvas (hasil rekaman)
-   ============================================================ */
-
-const faceCanvas = document.createElement('canvas');
-const faceCtx = faceCanvas.getContext('2d', { willReadFrequently: true });
-let lastTransformStr = '';
-
-function clamp(v, a, b) { return v < a ? a : (v > b ? b : v); }
-
-/* Rect crop "object-fit: cover" (paling besar, rasio sesuai kotak) */
-function coverRect(vw, vh, dstRatio) {
-  const srcRatio = vw / vh;
-  let sw, sh;
-  if (srcRatio > dstRatio) { sh = vh; sw = vh * dstRatio; }
-  else                     { sw = vw; sh = vw / dstRatio; }
-  return { sx: (vw - sw) / 2, sy: (vh - sh) / 2, sw, sh };
-}
-
-/* Rect crop aktif (mengikuti wajah). Tidak pernah "zoom out" melebihi cover. */
-function getCropRect(vw, vh, dstRatio) {
-  const cover = coverRect(vw, vh, dstRatio);
-  const c = state.crop;
-  if (!state.faceMode || !c) return cover;
-
-  let sh = c.h * vh;
-  let sw = sh * dstRatio;
-  if (sw > vw) { sw = vw; sh = sw / dstRatio; }
-  if (sh > vh) { sh = vh; sw = sh * dstRatio; }
-  if (sw > cover.sw) { sw = cover.sw; sh = cover.sh; }
-
-  let sx = c.cx * vw - sw / 2;
-  let sy = c.cy * vh - sh / 2;
-  sx = clamp(sx, 0, vw - sw);
-  sy = clamp(sy, 0, vh - sh);
-
-  return { sx, sy, sw, sh };
-}
-
-/* Gambar video upload ke canvas rekaman mengikuti wajah */
-function drawFaceAware(video, dx, dy, dw, dh) {
-  if (!video || !video.videoWidth || !video.videoHeight) {
-    ctx.fillStyle = '#0d0d0f';
-    ctx.fillRect(dx, dy, dw, dh);
-    return;
-  }
-  const r = getCropRect(video.videoWidth, video.videoHeight, dw / dh);
-  try { ctx.drawImage(video, r.sx, r.sy, r.sw, r.sh, dx, dy, dw, dh); } catch (e) {}
-}
-
-/* ---------- inisialisasi detektor ---------- */
-(function initFaceDetector() {
-  if ('FaceDetector' in window) {
-    try {
-      state.faceDetector = new window.FaceDetector({ fastMode: true, maxDetectedFaces: 1 });
-    } catch (e) {
-      state.faceDetector = null;
-    }
-  }
-})();
-
-/* ---------- heuristik warna kulit (fallback) ---------- */
-function isSkinPixel(r, g, b) {
-  const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
-  const rgbOk = r > 95 && g > 40 && b > 20 && (mx - mn) > 15 &&
-                Math.abs(r - g) > 15 && r > g && r > b;
-  if (!rgbOk) return false;
-  const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
-  const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
-  return cb >= 77 && cb <= 127 && cr >= 133 && cr <= 173;
-}
-
-function detectFaceHeuristic(video) {
-  const vw = video.videoWidth, vh = video.videoHeight;
-  if (!vw || !vh) return null;
-
-  const W = 72;
-  const H = Math.max(2, Math.round(W * vh / vw));
-  faceCanvas.width = W;
-  faceCanvas.height = H;
-
-  try { faceCtx.drawImage(video, 0, 0, W, H); } catch (e) { return null; }
-
-  let img;
-  try { img = faceCtx.getImageData(0, 0, W, H).data; } catch (e) { return null; }
-
-  let sW = 0, sX = 0, sY = 0, sXX = 0, sYY = 0, count = 0;
-
-  for (let y = 0; y < H; y++) {
-    const wy = 1 - Math.abs(y / H - 0.38) * 0.9;   // bias ke bagian atas frame
-    for (let x = 0; x < W; x++) {
-      const i = (y * W + x) * 4;
-      if (!isSkinPixel(img[i], img[i + 1], img[i + 2])) continue;
-      const wx = 1 - Math.abs(x / W - 0.5) * 0.7;
-      const w = Math.max(0.05, wx) * Math.max(0.05, wy);
-      count++;
-      sX += x * w; sY += y * w;
-      sXX += x * x * w; sYY += y * y * w;
-      sW += w;
-    }
-  }
-
-  if (sW <= 0) return null;
-  if (count / (W * H) < 0.02) return null;         // terlalu sedikit → abaikan
-
-  const cx = sX / sW, cy = sY / sW;
-  const sdx = Math.sqrt(Math.max(0, sXX / sW - cx * cx));
-  const sdy = Math.sqrt(Math.max(0, sYY / sW - cy * cy));
-
-  let bw = Math.max(sdx * 3.0, W * 0.14);
-  let bh = Math.max(sdy * 3.0, H * 0.14);
-  if (bh < bw * 1.05) bh = bw * 1.05;
-
-  const kx = vw / W, ky = vh / H;
-  return {
-    x: (cx - bw / 2) * kx,
-    y: (cy - bh / 2) * ky,
-    width: bw * kx,
-    height: bh * ky
-  };
-}
-
-/* ---------- deteksi (native dulu, lalu heuristik) ---------- */
-async function detectFace(video) {
-  if (state.faceDetector) {
-    try {
-      const faces = await state.faceDetector.detect(video);
-      if (faces && faces.length) {
-        const b = faces[0].boundingBox;
-        if (b && b.width > 0 && b.height > 0) {
-          return { x: b.x, y: b.y, width: b.width, height: b.height };
-        }
-      }
-      return null;   // API native jalan tapi tidak ada wajah
-    } catch (e) {
-      state.faceDetector = null;   // gagal → pakai heuristik
-    }
-  }
-  return detectFaceHeuristic(video);
-}
-
-/* ---------- target crop dari kotak wajah ---------- */
-function updateFaceTarget(box) {
-  const vw = uploadVideo.videoWidth, vh = uploadVideo.videoHeight;
-  if (!box || !vw || !vh) return;
-
-  const cx = (box.x + box.width / 2) / vw;
-  const cy = (box.y + box.height / 2) / vh;
-  const faceH = box.height / vh;
-
-  // crop = ±2.6x tinggi wajah (ada ruang di atas & bawah)
-  const h = clamp(faceH * 2.6, 0.18, 1);
-
-  state.cropTarget = {
-    cx: clamp(cx, 0, 1),
-    cy: clamp(cy, 0, 1),
-    h
-  };
-  state.lastFaceSeen = performance.now();
-  setFaceFound(true);
-}
-
-function resetCrop() {
-  const base = { cx: 0.5, cy: 0.42, h: 1 };   // fallback: tengah-atas
-  state.crop = { ...base };
-  state.cropTarget = { ...base };
-}
-
-function smoothCrop() {
-  const c = state.crop, t = state.cropTarget;
-  if (!c || !t) return;
-  const k = 0.16;
-  c.cx += (t.cx - c.cx) * k;
-  c.cy += (t.cy - c.cy) * k;
-  c.h  += (t.h  - c.h ) * k;
-}
-
-/* ---------- terapkan crop ke elemen <video> (tampilan layar) ---------- */
-function applyVideoTransform() {
-  if (!uploadVideo.videoWidth || !uploadVideo.videoHeight) return;
-
-  const rect = uploadScreen.getBoundingClientRect();
-  if (!rect.width || !rect.height) return;
-
-  const aspect = rect.width / rect.height;
-  const vw = uploadVideo.videoWidth, vh = uploadVideo.videoHeight;
-  const cover = coverRect(vw, vh, aspect);
-  const crop  = getCropRect(vw, vh, aspect);
-
-  const z = cover.sw / crop.sw;
-
-  if (!state.faceMode || Math.abs(z - 1) < 0.002) {
-    if (lastTransformStr !== '') {
-      uploadVideo.style.transform = '';
-      lastTransformStr = '';
-    }
-    return;
-  }
-
-  const fx = (crop.sx + crop.sw / 2 - cover.sx) / cover.sw;  // 0..1 dalam kotak
-  const fy = (crop.sy + crop.sh / 2 - cover.sy) / cover.sh;
-
-  const tx = (0.5 - fx) * rect.width * z;
-  const ty = (0.5 - fy) * rect.height * z;
-
-  const tr = `translate(${tx.toFixed(2)}px, ${ty.toFixed(2)}px) scale(${z.toFixed(4)})`;
-  if (tr !== lastTransformStr) {
-    uploadVideo.style.transform = tr;
-    lastTransformStr = tr;
-  }
-}
-
-/* ---------- indikator titik hijau di tombol "Wajah" ---------- */
-function setFaceFound(v) {
-  if (state.faceFound === v) return;
-  state.faceFound = v;
-  btnFace.classList.toggle('has-face', v);
-}
-
-/* ---------- loop tracking ---------- */
-function faceTick() {
-  state.faceRAF = requestAnimationFrame(faceTick);
-
-  if (document.hidden) return;
-  if (!state.faceMode || !state.uploadReady) return;
-  if (!uploadVideo.videoWidth) return;
-
-  const now = performance.now();
-
-  if (!state.detecting && now - state.lastDetect > 130) {
-    state.lastDetect = now;
-    state.detecting = true;
-
-    Promise.resolve()
-      .then(() => detectFace(uploadVideo))
-      .then(box => {
-        if (box) {
-          updateFaceTarget(box);
-        } else if (performance.now() - state.lastFaceSeen > 1800) {
-          // sudah lama tidak ada wajah → kembali ke framing normal
-          state.cropTarget = { cx: 0.5, cy: 0.42, h: 1 };
-          setFaceFound(false);
-        }
-      })
-      .catch(() => {})
-      .finally(() => { state.detecting = false; });
-  }
-
-  smoothCrop();
-  applyVideoTransform();
-}
-
-function startFaceTracking() {
-  if (state.faceRAF) return;
-  state.faceRAF = requestAnimationFrame(faceTick);
-}
-
-function stopFaceTracking() {
-  if (state.faceRAF) cancelAnimationFrame(state.faceRAF);
-  state.faceRAF = null;
-  uploadVideo.style.transform = '';
-  lastTransformStr = '';
-  setFaceFound(false);
 }
 
 /* ============================================================
@@ -1312,10 +1193,9 @@ fileInput.addEventListener('change', async (e) => {
     uploadPlaceholder.classList.add('hidden');
     state.uploadReady = true;
 
-    /* reset framing wajah untuk video baru */
-    resetCrop();
-    setFaceFound(false);
-    if (state.faceMode) startFaceTracking();
+    /* Video baru -> posisi kembali ke tengah */
+    resetUploadPosition(true);
+    btnResetPan.classList.remove('hidden');
 
     ensureAudioCtx();
     try {
@@ -1330,37 +1210,20 @@ fileInput.addEventListener('change', async (e) => {
     try {
       uploadVideo.muted = false;
       await uploadVideo.play();
-      showToast('Video berhasil dimuat', 'success');
+      showToast('Video dimuat — geser untuk atur posisi', 'success');
     } catch (autoplayErr) {
       uploadVideo.muted = true;
       try { await uploadVideo.play(); } catch(e) {}
       showToast('Video dimuat — ketuk ▶ untuk audio', '');
     }
 
+    showPanHint();
     updatePlayPauseIcon();
     updateProgressBar();
   } catch (err) {
     showToast('Gagal: ' + err.message, 'error');
   } finally {
     hideLoader();
-  }
-});
-
-/* ============================================================
-   TOGGLE AUTO FOKUS WAJAH
-   ============================================================ */
-btnFace.addEventListener('click', () => {
-  state.faceMode = !state.faceMode;
-  btnFace.classList.toggle('active-face', state.faceMode);
-
-  if (state.faceMode) {
-    if (state.uploadReady) startFaceTracking();
-    showToast('👤 Auto fokus wajah aktif', 'success');
-  } else {
-    stopFaceTracking();
-    resetCrop();
-    uploadVideo.style.transform = '';
-    showToast('Auto fokus wajah nonaktif');
   }
 });
 
@@ -1387,7 +1250,6 @@ async function startRecording() {
   ensureAudioCtx();
 
   // 3) Kalau ada video upload yang pause, play-kan otomatis
-  //    supaya rekaman langsung "hidup"
   if (state.uploadReady && uploadVideo.paused) {
     try {
       uploadVideo.muted = false;
@@ -1601,10 +1463,7 @@ let resizeTimeout;
 function handleResize() {
   if (state.isRecording) return;
   clearTimeout(resizeTimeout);
-  resizeTimeout = setTimeout(() => {
-    applyQuality(state.quality);
-    applyVideoTransform();   // hitung ulang transform wajah
-  }, 150);
+  resizeTimeout = setTimeout(() => applyQuality(state.quality), 150);
 }
 window.addEventListener('resize', handleResize);
 window.addEventListener('orientationchange', handleResize);
@@ -1616,7 +1475,6 @@ function cleanup() {
   if (state.stream) state.stream.getTracks().forEach(t => t.stop());
   if (state.micStream) state.micStream.getTracks().forEach(t => t.stop());
   if (state.isRecording) stopRecording();
-  stopFaceTracking();
 }
 window.addEventListener('pagehide', cleanup);
 window.addEventListener('beforeunload', cleanup);
@@ -1624,14 +1482,11 @@ window.addEventListener('beforeunload', cleanup);
 /* ============================================================
    INIT
    ============================================================ */
-resetCrop();
-btnFace.classList.toggle('active-face', state.faceMode);
 applyQuality('720');
 requestAnimationFrame(() => applyQuality(state.quality));
+applyUploadPosition();
 updatePlayPauseIcon();
-console.log('%c📱 Split Screen Recorder — Live + Face Tracking + Playback saat rekam',
-  'color:#6366f1;font-weight:bold;font-size:14px');
-console.log('Detektor wajah:', state.faceDetector ? 'FaceDetector (native)' : 'heuristik warna kulit');
+console.log('%c📱 Split Screen Recorder — video upload bisa digeser manual', 'color:#6366f1;font-weight:bold;font-size:14px');
 </script>
 
 </body>
