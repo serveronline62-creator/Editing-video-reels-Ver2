@@ -35,15 +35,25 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    .app { height: 100vh; height: 100dvh; display: flex; align-items: center; justify-content: center; }
+    .app {
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
     .phone-frame {
       position: relative;
-      width: 100vw; height: 100vh; height: 100dvh;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
       max-width: calc(100vh * 9 / 16);
       max-width: calc(100dvh * 9 / 16);
       background: #000;
-      display: flex; flex-direction: column; overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
 
     .screen {
@@ -52,13 +62,24 @@
       min-height: 0;
       overflow: hidden;
       background: #0d0d0f;
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .screen-live   { flex: 0.8 1 0; }
     .screen-upload { flex: 1.2 1 0; }
 
-    .screen video { width: 100%; height: 100%; object-fit: cover; background: #000; display: block; }
+    .screen video {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      background: #000;
+      display: block;
+      /* dipakai untuk auto-zoom / auto-pan mengikuti wajah */
+      transform-origin: center center;
+      will-change: transform;
+      backface-visibility: hidden;
+    }
 
     .divider {
       flex: 0 0 2px;
@@ -67,18 +88,29 @@
     }
 
     .badge {
-      position: absolute; top: 12px; left: 12px;
-      padding: 5px 10px; border-radius: 999px;
-      font-size: 10px; font-weight: 800; letter-spacing: 0.8px;
-      color: #fff; z-index: 4;
-      display: inline-flex; align-items: center; gap: 5px;
-      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      color: #fff;
+      z-index: 4;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(255,255,255,0.15);
     }
     .badge.live { background: rgba(239,68,68,0.85); }
     .badge.live .dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: #fff; animation: pulseDot 1.5s ease-in-out infinite;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #fff;
+      animation: pulseDot 1.5s ease-in-out infinite;
     }
     .badge.upload { background: rgba(99,102,241,0.85); }
 
@@ -92,70 +124,103 @@
       top: calc(12px + var(--safe-top));
       left: 50%;
       transform: translateX(-50%) translateY(-10px);
-      padding: 7px 14px; border-radius: 999px;
+      padding: 7px 14px;
+      border-radius: 999px;
       background: rgba(239,68,68,0.95);
-      color: #fff; font-size: 12px; font-weight: 800;
-      letter-spacing: 0.6px; font-variant-numeric: tabular-nums;
-      display: flex; align-items: center; gap: 7px;
-      z-index: 30; opacity: 0; pointer-events: none;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      font-variant-numeric: tabular-nums;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      z-index: 30;
+      opacity: 0;
+      pointer-events: none;
       transition: opacity 0.25s, transform 0.25s;
       box-shadow: 0 4px 24px rgba(239,68,68,0.5);
     }
     .rec-badge.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     .rec-badge .rec-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: #fff; animation: pulseDot 1s ease-in-out infinite;
-    }
-    .rec-badge .mic-indicator {
-      display: inline-flex; align-items: center; gap: 2px;
-      padding: 2px 5px; margin: 0 2px;
-      background: rgba(255,255,255,0.2);
-      border-radius: 999px;
-    }
-    .rec-badge .mic-indicator svg { width: 10px; height: 10px; }
-    .rec-badge .mic-indicator.off { opacity: 0.35; }
-    .rec-badge .mic-indicator.on  { animation: pulseMic 1s ease-in-out infinite; }
-    @keyframes pulseMic {
-      0%, 100% { background: rgba(255,255,255,0.2); }
-      50%      { background: rgba(255,255,255,0.45); }
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #fff;
+      animation: pulseDot 1s ease-in-out infinite;
     }
 
     .placeholder {
-      position: absolute; inset: 0;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 8px; color: var(--muted); font-size: 12px; text-align: center;
-      padding: 20px; pointer-events: none; transition: opacity 0.3s; z-index: 2;
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+      padding: 20px;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      z-index: 2;
     }
-    .placeholder svg { width: 40px; height: 40px; opacity: 0.4; stroke: currentColor; fill: none; stroke-width: 1.5; }
+    .placeholder svg {
+      width: 40px; height: 40px;
+      opacity: 0.4;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.5;
+    }
     .placeholder.hidden { opacity: 0; }
 
     .video-progress {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      height: 3px; background: rgba(255,255,255,0.12); z-index: 6;
-      cursor: pointer; transition: height 0.2s;
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: rgba(255,255,255,0.12);
+      z-index: 6;
+      cursor: pointer;
+      transition: height 0.2s;
     }
     .video-progress:hover { height: 5px; }
     .video-progress-fill {
-      height: 100%; width: 0%;
+      height: 100%;
+      width: 0%;
       background: linear-gradient(90deg, var(--accent), var(--accent-2));
       transition: width 0.1s linear;
       box-shadow: 0 0 8px rgba(99,102,241,0.6);
     }
 
     .control-panel {
-      flex: 0 0 auto; background: var(--panel);
+      flex: 0 0 auto;
+      background: var(--panel);
       border-top: 1px solid var(--border);
       padding: 12px 14px calc(12px + var(--safe-bottom));
-      display: flex; flex-direction: column; gap: 10px; z-index: 10;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 10;
     }
 
-    .ctrl-row { display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .ctrl-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
 
     .circle-btn {
-      width: 42px; height: 42px; border-radius: 50%;
-      border: 1px solid var(--border); background: var(--surface); color: var(--text);
-      cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       transition: transform 0.15s, background 0.2s, opacity 0.2s;
     }
     .circle-btn svg { width: 18px; height: 18px; }
@@ -171,11 +236,19 @@
     .circle-btn.primary svg { width: 22px; height: 22px; }
 
     .pill {
-      padding: 8px 12px; border-radius: 12px;
-      border: 1px solid var(--border); background: var(--surface); color: var(--text);
-      font-size: 11px; font-weight: 600; cursor: pointer;
-      display: inline-flex; align-items: center; gap: 5px;
-      transition: transform 0.15s, background 0.2s, opacity 0.2s; white-space: nowrap;
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: transform 0.15s, background 0.2s, opacity 0.2s, border-color 0.2s, color 0.2s;
+      white-space: nowrap;
     }
     .pill svg { width: 14px; height: 14px; }
     .pill:active { transform: scale(0.95); }
@@ -186,20 +259,40 @@
       border-color: rgba(16,185,129,0.4);
       color: var(--green);
     }
-    /* Mic aktif saat merekam = highlight lebih tegas */
-    .pill.active.recording-mic {
-      background: rgba(239,68,68,0.18);
-      border-color: rgba(239,68,68,0.5);
-      color: #f87171;
-      box-shadow: 0 0 0 2px rgba(239,68,68,0.15);
+    .pill.active-face {
+      background: rgba(99,102,241,0.15);
+      border-color: rgba(99,102,241,0.45);
+      color: #a5b4fc;
     }
     .pill.icon-only { padding: 8px; width: 34px; justify-content: center; }
 
+    /* indikator kecil: hijau = wajah terdeteksi */
+    .face-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.25);
+      transition: background 0.2s, box-shadow 0.2s;
+      flex: 0 0 auto;
+    }
+    .pill.has-face .face-dot {
+      background: var(--green);
+      box-shadow: 0 0 8px rgba(16,185,129,0.85);
+    }
+
     .record-btn {
-      width: 100%; padding: 14px; border-radius: 14px; border: none;
+      width: 100%;
+      padding: 14px;
+      border-radius: 14px;
+      border: none;
       background: linear-gradient(135deg, #ff3366, #e60045);
-      color: #fff; font-size: 14px; font-weight: 700; letter-spacing: 0.3px;
-      cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       gap: 10px;
       transition: transform 0.15s, background 0.25s, box-shadow 0.25s;
       box-shadow: 0 4px 20px rgba(255,51,102,0.35);
@@ -208,7 +301,9 @@
     .record-btn:active { transform: scale(0.97); }
     .record-btn:disabled { opacity: 0.5; pointer-events: none; }
     .record-btn .rec-indicator {
-      width: 14px; height: 14px; border-radius: 50%; background: #fff;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: #fff;
       transition: border-radius 0.25s;
       box-shadow: 0 0 8px rgba(255,255,255,0.6);
     }
@@ -226,10 +321,15 @@
     input[type="file"] { display: none; }
 
     .modal {
-      position: fixed; inset: 0;
+      position: fixed;
+      inset: 0;
       background: rgba(0,0,0,0.85);
-      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      z-index: 100; display: none; align-items: center; justify-content: center;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
       padding: 16px;
       padding-top: calc(16px + var(--safe-top));
       padding-bottom: calc(16px + var(--safe-bottom));
@@ -237,10 +337,16 @@
     .modal.show { display: flex; }
 
     .modal-card {
-      width: 100%; max-width: 420px; background: #16161a;
-      border-radius: 24px; border: 1px solid var(--border);
-      overflow: hidden; display: flex; flex-direction: column;
-      max-height: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      width: 100%;
+      max-width: 420px;
+      background: #16161a;
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      max-height: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
       animation: modalIn 0.25s ease;
     }
     @keyframes modalIn {
@@ -249,27 +355,64 @@
     }
 
     .modal-header {
-      padding: 18px 20px; font-size: 16px; font-weight: 700;
+      padding: 18px 20px;
+      font-size: 16px;
+      font-weight: 700;
       border-bottom: 1px solid var(--border);
-      display: flex; justify-content: space-between; align-items: center;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     .modal-header button {
-      background: var(--surface); border: none; color: var(--muted);
-      width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
-      display: inline-flex; align-items: center; justify-content: center;
+      background: var(--surface);
+      border: none;
+      color: var(--muted);
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       transition: background 0.2s;
     }
     .modal-header button:hover { background: var(--surface-hover); }
     .modal-header button svg { width: 16px; height: 16px; }
 
-    .modal-body { padding: 16px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
-    .modal-body video { width: 100%; border-radius: 14px; background: #000; max-height: 55vh; }
-    .modal-info { font-size: 12px; color: var(--muted); text-align: center; }
-    .modal-actions { display: flex; gap: 8px; flex-direction: column; }
+    .modal-body {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      overflow-y: auto;
+    }
+    .modal-body video {
+      width: 100%;
+      border-radius: 14px;
+      background: #000;
+      max-height: 55vh;
+    }
+    .modal-info {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      flex-direction: column;
+    }
     .modal-actions .modal-btn {
-      padding: 14px; border-radius: 14px; border: none;
-      font-size: 14px; font-weight: 700; color: #fff; cursor: pointer;
-      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 14px;
+      border-radius: 14px;
+      border: none;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
       transition: transform 0.15s, opacity 0.2s;
     }
     .modal-actions .modal-btn:active { transform: scale(0.97); }
@@ -278,19 +421,30 @@
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
       box-shadow: 0 4px 16px rgba(99,102,241,0.4);
     }
-    .modal-btn.secondary { background: var(--surface); border: 1px solid var(--border); }
+    .modal-btn.secondary {
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
 
     .toast {
-      position: fixed; bottom: calc(220px + var(--safe-bottom)); left: 50%;
+      position: fixed;
+      bottom: calc(220px + var(--safe-bottom));
+      left: 50%;
       transform: translateX(-50%) translateY(20px);
-      background: rgba(30,30,35,0.98); color: #fff;
-      padding: 12px 20px; border-radius: 14px;
-      font-size: 13px; font-weight: 600;
+      background: rgba(30,30,35,0.98);
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 600;
       border: 1px solid var(--border);
       box-shadow: 0 12px 32px rgba(0,0,0,0.6);
-      opacity: 0; pointer-events: none;
+      opacity: 0;
+      pointer-events: none;
       transition: opacity 0.25s, transform 0.25s;
-      z-index: 200; max-width: 85%; text-align: center;
+      z-index: 200;
+      max-width: 85%;
+      text-align: center;
       backdrop-filter: blur(20px);
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -298,11 +452,19 @@
     .toast.success { background: rgba(16,185,129,0.95); }
 
     .loader {
-      position: absolute; inset: 0;
-      background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
-      display: none; align-items: center; justify-content: center;
-      flex-direction: column; gap: 14px;
-      z-index: 50; color: #fff; font-size: 13px; font-weight: 600;
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 14px;
+      z-index: 50;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
     }
     .loader.show { display: flex; }
     .spinner {
@@ -372,12 +534,6 @@
 
     <div class="rec-badge" id="recBadge">
       <span class="rec-dot"></span>
-      <span class="mic-indicator" id="recMicIcon" title="Mic sedang merekam">
-        <svg viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 15c1.66 0 3-1.34 3-3V6c0-1.66-1.34-3-3-3s-3 1.34-3 3v6c0 1.66 1.34 3 3 3z"/>
-          <path d="M17 12c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
-        </svg>
-      </span>
       <span id="recTimer">00:00</span>
     </div>
 
@@ -414,7 +570,7 @@
             <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
           </svg>
         </button>
-        <button class="pill" id="btnMic" title="Mic komentar — otomatis aktif saat rekam">
+        <button class="pill" id="btnMic">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
             <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
@@ -441,6 +597,16 @@
             <line x1="17" y1="16" x2="23" y2="16"/>
           </svg>
           <span id="qualityLabel">HD</span>
+        </button>
+        <button class="pill active-face" id="btnFace" title="Auto fokus wajah pada video upload">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M8.5 14.2s1.3 1.9 3.5 1.9 3.5-1.9 3.5-1.9"/>
+            <line x1="9" y1="9.6" x2="9.01" y2="9.6"/>
+            <line x1="15" y1="9.6" x2="15.01" y2="9.6"/>
+          </svg>
+          Wajah
+          <span class="face-dot"></span>
         </button>
       </div>
 
@@ -522,7 +688,18 @@ const state = {
   recStartTime: 0, timerInterval: null, drawRAF: null,
   quality: '720',
   splitRatio: DEFAULT_SPLIT,
-  previewBlob: null, previewUrl: null, previewMime: ''
+  previewBlob: null, previewUrl: null, previewMime: '',
+
+  /* ---- face tracking ---- */
+  faceMode: true,          // auto fokus wajah aktif?
+  faceDetector: null,      // native FaceDetector (kalau browser mendukung)
+  faceFound: false,
+  crop: null,              // crop aktif (sudah di-smooth)  { cx, cy, h }
+  cropTarget: null,        // crop tujuan                  { cx, cy, h }
+  faceRAF: null,
+  detecting: false,
+  lastDetect: 0,
+  lastFaceSeen: 0
 };
 
 /* ============================================================
@@ -538,10 +715,10 @@ const btnSwitchCam      = $('btnSwitchCam');
 const btnMic            = $('btnMic');
 const btnUpload         = $('btnUpload');
 const btnQuality        = $('btnQuality');
+const btnFace           = $('btnFace');
 const btnRecord         = $('btnRecord');
 const fileInput         = $('fileInput');
 const recBadge          = $('recBadge');
-const recMicIcon        = $('recMicIcon');
 const recTimerEl        = $('recTimer');
 const loader            = $('loader');
 const loaderText        = $('loaderText');
@@ -566,18 +743,17 @@ const phoneFrame        = document.querySelector('.phone-frame');
 const liveScreen        = document.querySelector('.screen-live');
 const uploadScreen      = document.querySelector('.screen-upload');
 
-/* Kontrol "berbahaya" — disable saat recording
-   (Mic TIDAK di sini, karena harus bisa toggle komentar live) */
-const RECORD_LOCKED_BTNS = [btnStartCam, btnSwitchCam, btnUpload, btnQuality];
+/* Kontrol yang di-disable selama recording (kontrol "berbahaya") */
+const RECORD_LOCKED_BTNS = [btnStartCam, btnSwitchCam, btnMic, btnUpload, btnQuality, btnFace];
 
-/* Kontrol playback — tetap aktif saat recording */
+/* Kontrol yang TETAP AKTIF selama recording (playback) */
 const RECORD_ACTIVE_BTNS = [btnPlayPause, btnBack, btnNext, btnStop];
 
 const ICON_PLAY  = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
 const ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>';
 
 /* ============================================================
-   CANVAS
+   CANVAS — DINAMIS MENGIKUTI LAYAR HP
    ============================================================ */
 const canvas = document.createElement('canvas');
 const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
@@ -601,8 +777,10 @@ function getLayoutMetrics() {
 function applyQuality(q) {
   const p = QUALITY_PRESETS[q];
   const { aspect, split } = getLayoutMetrics();
+
   canvas.width = p.w;
   canvas.height = Math.max(2, Math.round((p.w * aspect) / 2) * 2);
+
   state.quality = q;
   state.splitRatio = split;
   qualityLabel.textContent = p.label;
@@ -638,8 +816,10 @@ function startDrawLoop() {
 
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, W, H);
-    drawCover(liveVideo,   0, 0,      W, splitY);
-    drawCover(uploadVideo, 0, splitY, W, H - splitY);
+
+    drawCover(liveVideo, 0, 0, W, splitY);
+    /* video upload digambar mengikuti wajah (auto framing) */
+    drawFaceAware(uploadVideo, 0, splitY, W, H - splitY);
 
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
     ctx.fillRect(0, splitY - 1, W, 2);
@@ -651,6 +831,281 @@ function startDrawLoop() {
 function stopDrawLoop() {
   if (state.drawRAF) cancelAnimationFrame(state.drawRAF);
   state.drawRAF = null;
+}
+
+/* ============================================================
+   AUTO FOKUS WAJAH  (FACE TRACKING)
+   ============================================================
+   Cara kerja:
+   1. Setiap ±130ms frame video upload dianalisis untuk mencari wajah.
+      - Utama  : Shape Detection API (FaceDetector) — Chrome Android.
+      - Cadangan: detektor warna kulit (skin-tone) berbasis piksel.
+   2. Hasil deteksi → titik tengah + ukuran crop.
+   3. Nilai crop di-smooth (lerp) supaya kamera bergerak halus.
+   4. Crop dipakai di DUA tempat agar layar & hasil rekaman sama:
+      - CSS transform pada <video> (tampilan di layar)
+      - drawImage source-rect pada canvas (hasil rekaman)
+   ============================================================ */
+
+const faceCanvas = document.createElement('canvas');
+const faceCtx = faceCanvas.getContext('2d', { willReadFrequently: true });
+let lastTransformStr = '';
+
+function clamp(v, a, b) { return v < a ? a : (v > b ? b : v); }
+
+/* Rect crop "object-fit: cover" (paling besar, rasio sesuai kotak) */
+function coverRect(vw, vh, dstRatio) {
+  const srcRatio = vw / vh;
+  let sw, sh;
+  if (srcRatio > dstRatio) { sh = vh; sw = vh * dstRatio; }
+  else                     { sw = vw; sh = vw / dstRatio; }
+  return { sx: (vw - sw) / 2, sy: (vh - sh) / 2, sw, sh };
+}
+
+/* Rect crop aktif (mengikuti wajah). Tidak pernah "zoom out" melebihi cover. */
+function getCropRect(vw, vh, dstRatio) {
+  const cover = coverRect(vw, vh, dstRatio);
+  const c = state.crop;
+  if (!state.faceMode || !c) return cover;
+
+  let sh = c.h * vh;
+  let sw = sh * dstRatio;
+  if (sw > vw) { sw = vw; sh = sw / dstRatio; }
+  if (sh > vh) { sh = vh; sw = sh * dstRatio; }
+  if (sw > cover.sw) { sw = cover.sw; sh = cover.sh; }
+
+  let sx = c.cx * vw - sw / 2;
+  let sy = c.cy * vh - sh / 2;
+  sx = clamp(sx, 0, vw - sw);
+  sy = clamp(sy, 0, vh - sh);
+
+  return { sx, sy, sw, sh };
+}
+
+/* Gambar video upload ke canvas rekaman mengikuti wajah */
+function drawFaceAware(video, dx, dy, dw, dh) {
+  if (!video || !video.videoWidth || !video.videoHeight) {
+    ctx.fillStyle = '#0d0d0f';
+    ctx.fillRect(dx, dy, dw, dh);
+    return;
+  }
+  const r = getCropRect(video.videoWidth, video.videoHeight, dw / dh);
+  try { ctx.drawImage(video, r.sx, r.sy, r.sw, r.sh, dx, dy, dw, dh); } catch (e) {}
+}
+
+/* ---------- inisialisasi detektor ---------- */
+(function initFaceDetector() {
+  if ('FaceDetector' in window) {
+    try {
+      state.faceDetector = new window.FaceDetector({ fastMode: true, maxDetectedFaces: 1 });
+    } catch (e) {
+      state.faceDetector = null;
+    }
+  }
+})();
+
+/* ---------- heuristik warna kulit (fallback) ---------- */
+function isSkinPixel(r, g, b) {
+  const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+  const rgbOk = r > 95 && g > 40 && b > 20 && (mx - mn) > 15 &&
+                Math.abs(r - g) > 15 && r > g && r > b;
+  if (!rgbOk) return false;
+  const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
+  const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
+  return cb >= 77 && cb <= 127 && cr >= 133 && cr <= 173;
+}
+
+function detectFaceHeuristic(video) {
+  const vw = video.videoWidth, vh = video.videoHeight;
+  if (!vw || !vh) return null;
+
+  const W = 72;
+  const H = Math.max(2, Math.round(W * vh / vw));
+  faceCanvas.width = W;
+  faceCanvas.height = H;
+
+  try { faceCtx.drawImage(video, 0, 0, W, H); } catch (e) { return null; }
+
+  let img;
+  try { img = faceCtx.getImageData(0, 0, W, H).data; } catch (e) { return null; }
+
+  let sW = 0, sX = 0, sY = 0, sXX = 0, sYY = 0, count = 0;
+
+  for (let y = 0; y < H; y++) {
+    const wy = 1 - Math.abs(y / H - 0.38) * 0.9;   // bias ke bagian atas frame
+    for (let x = 0; x < W; x++) {
+      const i = (y * W + x) * 4;
+      if (!isSkinPixel(img[i], img[i + 1], img[i + 2])) continue;
+      const wx = 1 - Math.abs(x / W - 0.5) * 0.7;
+      const w = Math.max(0.05, wx) * Math.max(0.05, wy);
+      count++;
+      sX += x * w; sY += y * w;
+      sXX += x * x * w; sYY += y * y * w;
+      sW += w;
+    }
+  }
+
+  if (sW <= 0) return null;
+  if (count / (W * H) < 0.02) return null;         // terlalu sedikit → abaikan
+
+  const cx = sX / sW, cy = sY / sW;
+  const sdx = Math.sqrt(Math.max(0, sXX / sW - cx * cx));
+  const sdy = Math.sqrt(Math.max(0, sYY / sW - cy * cy));
+
+  let bw = Math.max(sdx * 3.0, W * 0.14);
+  let bh = Math.max(sdy * 3.0, H * 0.14);
+  if (bh < bw * 1.05) bh = bw * 1.05;
+
+  const kx = vw / W, ky = vh / H;
+  return {
+    x: (cx - bw / 2) * kx,
+    y: (cy - bh / 2) * ky,
+    width: bw * kx,
+    height: bh * ky
+  };
+}
+
+/* ---------- deteksi (native dulu, lalu heuristik) ---------- */
+async function detectFace(video) {
+  if (state.faceDetector) {
+    try {
+      const faces = await state.faceDetector.detect(video);
+      if (faces && faces.length) {
+        const b = faces[0].boundingBox;
+        if (b && b.width > 0 && b.height > 0) {
+          return { x: b.x, y: b.y, width: b.width, height: b.height };
+        }
+      }
+      return null;   // API native jalan tapi tidak ada wajah
+    } catch (e) {
+      state.faceDetector = null;   // gagal → pakai heuristik
+    }
+  }
+  return detectFaceHeuristic(video);
+}
+
+/* ---------- target crop dari kotak wajah ---------- */
+function updateFaceTarget(box) {
+  const vw = uploadVideo.videoWidth, vh = uploadVideo.videoHeight;
+  if (!box || !vw || !vh) return;
+
+  const cx = (box.x + box.width / 2) / vw;
+  const cy = (box.y + box.height / 2) / vh;
+  const faceH = box.height / vh;
+
+  // crop = ±2.6x tinggi wajah (ada ruang di atas & bawah)
+  const h = clamp(faceH * 2.6, 0.18, 1);
+
+  state.cropTarget = {
+    cx: clamp(cx, 0, 1),
+    cy: clamp(cy, 0, 1),
+    h
+  };
+  state.lastFaceSeen = performance.now();
+  setFaceFound(true);
+}
+
+function resetCrop() {
+  const base = { cx: 0.5, cy: 0.42, h: 1 };   // fallback: tengah-atas
+  state.crop = { ...base };
+  state.cropTarget = { ...base };
+}
+
+function smoothCrop() {
+  const c = state.crop, t = state.cropTarget;
+  if (!c || !t) return;
+  const k = 0.16;
+  c.cx += (t.cx - c.cx) * k;
+  c.cy += (t.cy - c.cy) * k;
+  c.h  += (t.h  - c.h ) * k;
+}
+
+/* ---------- terapkan crop ke elemen <video> (tampilan layar) ---------- */
+function applyVideoTransform() {
+  if (!uploadVideo.videoWidth || !uploadVideo.videoHeight) return;
+
+  const rect = uploadScreen.getBoundingClientRect();
+  if (!rect.width || !rect.height) return;
+
+  const aspect = rect.width / rect.height;
+  const vw = uploadVideo.videoWidth, vh = uploadVideo.videoHeight;
+  const cover = coverRect(vw, vh, aspect);
+  const crop  = getCropRect(vw, vh, aspect);
+
+  const z = cover.sw / crop.sw;
+
+  if (!state.faceMode || Math.abs(z - 1) < 0.002) {
+    if (lastTransformStr !== '') {
+      uploadVideo.style.transform = '';
+      lastTransformStr = '';
+    }
+    return;
+  }
+
+  const fx = (crop.sx + crop.sw / 2 - cover.sx) / cover.sw;  // 0..1 dalam kotak
+  const fy = (crop.sy + crop.sh / 2 - cover.sy) / cover.sh;
+
+  const tx = (0.5 - fx) * rect.width * z;
+  const ty = (0.5 - fy) * rect.height * z;
+
+  const tr = `translate(${tx.toFixed(2)}px, ${ty.toFixed(2)}px) scale(${z.toFixed(4)})`;
+  if (tr !== lastTransformStr) {
+    uploadVideo.style.transform = tr;
+    lastTransformStr = tr;
+  }
+}
+
+/* ---------- indikator titik hijau di tombol "Wajah" ---------- */
+function setFaceFound(v) {
+  if (state.faceFound === v) return;
+  state.faceFound = v;
+  btnFace.classList.toggle('has-face', v);
+}
+
+/* ---------- loop tracking ---------- */
+function faceTick() {
+  state.faceRAF = requestAnimationFrame(faceTick);
+
+  if (document.hidden) return;
+  if (!state.faceMode || !state.uploadReady) return;
+  if (!uploadVideo.videoWidth) return;
+
+  const now = performance.now();
+
+  if (!state.detecting && now - state.lastDetect > 130) {
+    state.lastDetect = now;
+    state.detecting = true;
+
+    Promise.resolve()
+      .then(() => detectFace(uploadVideo))
+      .then(box => {
+        if (box) {
+          updateFaceTarget(box);
+        } else if (performance.now() - state.lastFaceSeen > 1800) {
+          // sudah lama tidak ada wajah → kembali ke framing normal
+          state.cropTarget = { cx: 0.5, cy: 0.42, h: 1 };
+          setFaceFound(false);
+        }
+      })
+      .catch(() => {})
+      .finally(() => { state.detecting = false; });
+  }
+
+  smoothCrop();
+  applyVideoTransform();
+}
+
+function startFaceTracking() {
+  if (state.faceRAF) return;
+  state.faceRAF = requestAnimationFrame(faceTick);
+}
+
+function stopFaceTracking() {
+  if (state.faceRAF) cancelAnimationFrame(state.faceRAF);
+  state.faceRAF = null;
+  uploadVideo.style.transform = '';
+  lastTransformStr = '';
+  setFaceFound(false);
 }
 
 /* ============================================================
@@ -675,28 +1130,35 @@ function hideLoader() { loader.classList.remove('show'); }
 function updatePlayPauseIcon() {
   btnPlayPause.innerHTML = uploadVideo.paused ? ICON_PLAY : ICON_PAUSE;
 }
+
 function updateProgressBar() {
   const dur = uploadVideo.duration;
   if (!dur || !isFinite(dur)) { videoProgressFill.style.width = '0%'; return; }
   videoProgressFill.style.width = (uploadVideo.currentTime / dur * 100) + '%';
 }
+
 async function togglePlayPause() {
   if (!state.uploadReady) { showToast('Upload video dulu', 'error'); return; }
   ensureAudioCtx();
   if (uploadVideo.paused) {
     uploadVideo.muted = false;
-    try { await uploadVideo.play(); }
-    catch (err) { showToast('Gagal play: ' + err.message, 'error'); }
+    try {
+      await uploadVideo.play();
+    } catch (err) {
+      showToast('Gagal play: ' + err.message, 'error');
+    }
   } else {
     uploadVideo.pause();
   }
 }
+
 function seekBack() {
   if (!state.uploadReady) return;
   uploadVideo.currentTime = Math.max(0, uploadVideo.currentTime - SEEK_STEP);
   updateProgressBar();
   showToast(`⏪ -${SEEK_STEP}s`);
 }
+
 function seekNext() {
   if (!state.uploadReady) return;
   const dur = uploadVideo.duration || 0;
@@ -704,6 +1166,7 @@ function seekNext() {
   updateProgressBar();
   showToast(`⏩ +${SEEK_STEP}s`);
 }
+
 function stopVideo() {
   if (!state.uploadReady) return;
   uploadVideo.pause();
@@ -756,6 +1219,8 @@ async function startCamera(silent = false) {
   }
 }
 
+/* Tunggu sampai video (live atau upload) punya dimensi — supaya
+   frame pertama rekaman tidak hitam total. */
 function waitForVideoDim(video, timeoutMs = 1500) {
   return new Promise((resolve) => {
     const start = Date.now();
@@ -769,66 +1234,28 @@ function waitForVideoDim(video, timeoutMs = 1500) {
 }
 
 /* ============================================================
-   MIC — helper enable/disable + sinkron ke rekaman
+   MIC
    ============================================================ */
-async function enableMic(silent = false) {
-  if (state.micEnabled) return true;
+async function toggleMic() {
+  if (state.micEnabled) {
+    if (state.micStream) state.micStream.getTracks().forEach(t => t.stop());
+    if (state.micSource) { try { state.micSource.disconnect(); } catch(e){} state.micSource = null; }
+    state.micStream = null;
+    state.micEnabled = false;
+    btnMic.classList.remove('active');
+    showToast('Mic dimatikan');
+    return;
+  }
   try {
-    const ms = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        echoCancellation: true,
-        noiseSuppression: true,
-        autoGainControl: true
-      }
-    });
+    const ms = await navigator.mediaDevices.getUserMedia({ audio: true });
     state.micStream = ms;
     ensureAudioCtx();
     state.micSource = state.audioCtx.createMediaStreamSource(ms);
     state.micEnabled = true;
     btnMic.classList.add('active');
-    btnMic.classList.toggle('recording-mic', state.isRecording);
-
-    // Kalau sedang recording, langsung sambungkan mic ke recDest
-    if (state.isRecording && state.recDest) {
-      try { state.micSource.connect(state.recDest); } catch(e) {}
-    }
-    updateMicIndicator();
-    if (!silent) showToast('🎤 Mic aktif — suara kamu masuk ke rekaman', 'success');
-    return true;
+    showToast('Mic aktif — suara kamu akan direkam', 'success');
   } catch (err) {
-    if (!silent) showToast('Mic gagal: ' + err.message, 'error');
-    return false;
-  }
-}
-
-function disableMic(showMsg = true) {
-  if (state.micSource) {
-    try { if (state.recDest) state.micSource.disconnect(state.recDest); } catch(e) {}
-    try { state.micSource.disconnect(); } catch(e) {}
-    state.micSource = null;
-  }
-  if (state.micStream) {
-    state.micStream.getTracks().forEach(t => t.stop());
-    state.micStream = null;
-  }
-  state.micEnabled = false;
-  btnMic.classList.remove('active', 'recording-mic');
-  updateMicIndicator();
-  if (showMsg) showToast('Mic dimatikan');
-}
-
-async function toggleMic() {
-  if (state.micEnabled) disableMic();
-  else await enableMic();
-}
-
-function updateMicIndicator() {
-  if (state.isRecording && state.micEnabled) {
-    recMicIcon.classList.remove('hidden');
-    recMicIcon.classList.add('on');
-  } else {
-    recMicIcon.classList.add('hidden');
-    recMicIcon.classList.remove('on');
+    showToast('Mic gagal: ' + err.message, 'error');
   }
 }
 
@@ -856,7 +1283,7 @@ function ensureAudioCtx() {
 });
 
 /* ============================================================
-   UPLOAD
+   UPLOAD — support galeri HP
    ============================================================ */
 btnUpload.addEventListener('click', () => {
   fileInput.value = '';
@@ -885,13 +1312,20 @@ fileInput.addEventListener('change', async (e) => {
     uploadPlaceholder.classList.add('hidden');
     state.uploadReady = true;
 
+    /* reset framing wajah untuk video baru */
+    resetCrop();
+    setFaceFound(false);
+    if (state.faceMode) startFaceTracking();
+
     ensureAudioCtx();
     try {
       if (!state.uploadSource) {
         state.uploadSource = state.audioCtx.createMediaElementSource(uploadVideo);
         state.uploadSource.connect(state.audioCtx.destination);
       }
-    } catch (e) { console.warn('Audio routing gagal:', e); }
+    } catch (e) {
+      console.warn('Audio routing gagal:', e);
+    }
 
     try {
       uploadVideo.muted = false;
@@ -913,14 +1347,35 @@ fileInput.addEventListener('change', async (e) => {
 });
 
 /* ============================================================
-   REKAM — auto mic untuk komentar live
+   TOGGLE AUTO FOKUS WAJAH
+   ============================================================ */
+btnFace.addEventListener('click', () => {
+  state.faceMode = !state.faceMode;
+  btnFace.classList.toggle('active-face', state.faceMode);
+
+  if (state.faceMode) {
+    if (state.uploadReady) startFaceTracking();
+    showToast('👤 Auto fokus wajah aktif', 'success');
+  } else {
+    stopFaceTracking();
+    resetCrop();
+    uploadVideo.style.transform = '';
+    showToast('Auto fokus wajah nonaktif');
+  }
+});
+
+/* ============================================================
+   REKAM — versi "rekam saat live" + kontrol playback aktif
    ============================================================ */
 async function startRecording() {
   if (state.isRecording) return;
 
-  // 1) Pastikan kamera aktif (auto-start)
-  if (!state.stream) await startCamera(true);
+  // 1) Pastikan kamera aktif (auto-start kalau belum) — "rekam saat live"
+  if (!state.stream) {
+    await startCamera(true); // silent: toast rekam yang tampil
+  }
 
+  // 2) Minimal harus ada sesuatu untuk direkam
   if (!state.stream && !state.uploadReady) {
     showToast('Aktifkan kamera atau upload video dulu', 'error');
     return;
@@ -931,23 +1386,8 @@ async function startRecording() {
 
   ensureAudioCtx();
 
-  // 2) Pastikan audio pipeline sudah ada SEBELUM recording — supaya mic bisa
-  //    di-enable kapan saja tanpa perlu restart recorder.
-  if (state.audioCtx) {
-    try {
-      if (!state.uploadSource && state.uploadReady) {
-        state.uploadSource = state.audioCtx.createMediaElementSource(uploadVideo);
-        state.uploadSource.connect(state.audioCtx.destination);
-      }
-    } catch (e) {}
-  }
-
-  // 3) ✅ AUTO-ENABLE MIC untuk komentar (silent kalau ditolak)
-  if (!state.micEnabled) {
-    await enableMic(true); // silent = no toast, toast besar muncul nanti
-  }
-
-  // 4) Auto-play video bawah supaya rekaman langsung "hidup"
+  // 3) Kalau ada video upload yang pause, play-kan otomatis
+  //    supaya rekaman langsung "hidup"
   if (state.uploadReady && uploadVideo.paused) {
     try {
       uploadVideo.muted = false;
@@ -958,23 +1398,22 @@ async function startRecording() {
     }
   }
 
-  // 5) Tunggu dimensi video siap
+  // 4) Tunggu live video punya frame (hindari frame hitam di awal)
   if (state.stream) await waitForVideoDim(liveVideo, 1500);
   if (state.uploadReady) await waitForVideoDim(uploadVideo, 1500);
 
+  // 5) Kunci ukuran canvas sesuai layout saat ini
   applyQuality(state.quality);
 
   const videoStream = canvas.captureStream(30);
   const tracks = [...videoStream.getVideoTracks()];
 
-  // 6) Selalu buat recDest + audio track — supaya mic bisa toggle live.
-  //    Track ini silent sampai ada source yang connect.
   if (state.audioCtx) {
     const recDest = state.audioCtx.createMediaStreamDestination();
-    if (state.micSource)    { try { state.micSource.connect(recDest); } catch(e) {} }
-    if (state.uploadSource) { try { state.uploadSource.connect(recDest); } catch(e) {} }
-    tracks.push(...recDest.stream.getAudioTracks());
-    state.recDest = recDest;
+    let hasAudio = false;
+    if (state.micSource)    { state.micSource.connect(recDest);    hasAudio = true; }
+    if (state.uploadSource) { state.uploadSource.connect(recDest); hasAudio = true; }
+    if (hasAudio) { tracks.push(...recDest.stream.getAudioTracks()); state.recDest = recDest; }
   }
 
   const combinedStream = new MediaStream(tracks);
@@ -1032,16 +1471,11 @@ async function startRecording() {
     state.timerInterval = setInterval(updateRecTimer, 500);
     updateRecTimer();
 
-    // Lock kontrol berbahaya, tapi Mic & playback TETAP aktif
+    // ✅ Hanya kunci kontrol berbahaya — playback TETAP AKTIF
     RECORD_LOCKED_BTNS.forEach(b => b.disabled = true);
     RECORD_ACTIVE_BTNS.forEach(b => b.disabled = false);
-    btnMic.disabled = false; // ✅ pastikan mic bisa di-toggle
-    btnMic.classList.toggle('recording-mic', state.micEnabled);
 
-    updateMicIndicator();
-
-    const micInfo = state.micEnabled ? ' 🎤 komentar aktif' : ' (mic off)';
-    showToast('🔴 Merekam' + micInfo, 'success');
+    showToast('🔴 Merekam — kontrol ▶ ⏸ ◀ ▶ ⏹ tetap aktif', 'success');
   } catch (err) {
     showToast('Rekam gagal: ' + err.message, 'error');
   }
@@ -1059,12 +1493,9 @@ function stopRecording() {
   btnRecord.classList.remove('recording');
   recText.textContent = 'Mulai Rekam';
 
-  btnMic.classList.remove('recording-mic');
-  updateMicIndicator();
-
+  // Buka kembali semua kontrol
   RECORD_LOCKED_BTNS.forEach(b => b.disabled = false);
   RECORD_ACTIVE_BTNS.forEach(b => b.disabled = false);
-  btnMic.disabled = false;
 }
 
 function updateRecTimer() {
@@ -1170,7 +1601,10 @@ let resizeTimeout;
 function handleResize() {
   if (state.isRecording) return;
   clearTimeout(resizeTimeout);
-  resizeTimeout = setTimeout(() => applyQuality(state.quality), 150);
+  resizeTimeout = setTimeout(() => {
+    applyQuality(state.quality);
+    applyVideoTransform();   // hitung ulang transform wajah
+  }, 150);
 }
 window.addEventListener('resize', handleResize);
 window.addEventListener('orientationchange', handleResize);
@@ -1182,6 +1616,7 @@ function cleanup() {
   if (state.stream) state.stream.getTracks().forEach(t => t.stop());
   if (state.micStream) state.micStream.getTracks().forEach(t => t.stop());
   if (state.isRecording) stopRecording();
+  stopFaceTracking();
 }
 window.addEventListener('pagehide', cleanup);
 window.addEventListener('beforeunload', cleanup);
@@ -1189,11 +1624,14 @@ window.addEventListener('beforeunload', cleanup);
 /* ============================================================
    INIT
    ============================================================ */
+resetCrop();
+btnFace.classList.toggle('active-face', state.faceMode);
 applyQuality('720');
 requestAnimationFrame(() => applyQuality(state.quality));
 updatePlayPauseIcon();
-updateMicIndicator();
-console.log('%c📱 Split Screen Recorder — Live commentary recording', 'color:#6366f1;font-weight:bold;font-size:14px');
+console.log('%c📱 Split Screen Recorder — Live + Face Tracking + Playback saat rekam',
+  'color:#6366f1;font-weight:bold;font-size:14px');
+console.log('Detektor wajah:', state.faceDetector ? 'FaceDetector (native)' : 'heuristik warna kulit');
 </script>
 
 </body>
