@@ -80,7 +80,7 @@
     /* ====== VIDEO UPLOAD: bisa digeser manual ====== */
     .screen-upload video {
       object-position: 50% 50%;
-      touch-action: none;         /* supaya drag tidak memicu scroll/gesture */
+      touch-action: none;
       cursor: grab;
       will-change: object-position;
     }
@@ -712,6 +712,10 @@ const QUALITY_ORDER = ['480', '720', '1080'];
 const SEEK_STEP = 5;
 const DEFAULT_SPLIT = 0.40;
 
+/* ✅ TARGET ASPECT RATIO OUTPUT — dipaksa 9:16 (portrait)
+   nilai = height / width = 16 / 9 */
+const TARGET_ASPECT = 16 / 9;
+
 /* ============================================================
    STATE
    ============================================================ */
@@ -724,7 +728,6 @@ const state = {
   recStartTime: 0, timerInterval: null, drawRAF: null,
   quality: '720',
   splitRatio: DEFAULT_SPLIT,
-  /* Posisi manual video upload (0..1). 0.5 = tengah */
   uploadPos: { x: 0.5, y: 0.5 },
   previewBlob: null, previewUrl: null, previewMime: ''
 };
@@ -771,32 +774,32 @@ const phoneFrame        = document.querySelector('.phone-frame');
 const liveScreen        = document.querySelector('.screen-live');
 const uploadScreen      = document.querySelector('.screen-upload');
 
-/* Kontrol yang di-disable selama recording (kontrol "berbahaya") */
 const RECORD_LOCKED_BTNS = [btnStartCam, btnSwitchCam, btnMic, btnUpload, btnQuality];
-
-/* Kontrol yang TETAP AKTIF selama recording (playback) */
 const RECORD_ACTIVE_BTNS = [btnPlayPause, btnBack, btnNext, btnStop];
 
 const ICON_PLAY  = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
 const ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>';
 
 /* ============================================================
-   CANVAS — DINAMIS MENGIKUTI LAYAR HP
+   CANVAS — OUTPUT DIPAKSA 9:16
    ============================================================ */
 const canvas = document.createElement('canvas');
 const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
 
 function getLayoutMetrics() {
-  const liveRect = liveScreen.getBoundingClientRect();
+  const liveRect   = liveScreen.getBoundingClientRect();
   const uploadRect = uploadScreen.getBoundingClientRect();
-  const frameRect = phoneFrame.getBoundingClientRect();
 
-  const liveH = liveRect.height;
-  const uploadH = uploadRect.height;
+  const liveH    = liveRect.height;
+  const uploadH  = uploadRect.height;
   const screensH = liveH + uploadH;
-  const screensW = frameRect.width;
 
-  const aspect = (screensW > 0 && screensH > 0) ? (screensH / screensW) : (16 / 9);
+  /* ✅ KUNCI: aspect ratio output dipaksa 9:16, tidak peduli bentuk layar HP.
+     Hasilnya: 540×960, 720×1280, 1080×1920. */
+  const aspect = TARGET_ASPECT;
+
+  /* Proporsi split live vs upload tetap mengikuti layout di layar,
+     jadi preview dan hasil rekaman terlihat konsisten. */
   const split = (screensH > 0) ? (liveH / screensH) : DEFAULT_SPLIT;
 
   return { aspect, split };
@@ -817,8 +820,6 @@ function applyQuality(q) {
 /* ============================================================
    POSISI MANUAL VIDEO UPLOAD (PAN / GESER)
    ============================================================ */
-
-/* Terapkan posisi ke elemen <video> (object-position) */
 function applyUploadPosition() {
   const p = state.uploadPos;
   uploadVideo.style.objectPosition = `${(p.x * 100).toFixed(3)}% ${(p.y * 100).toFixed(3)}%`;
@@ -831,8 +832,6 @@ function resetUploadPosition(silent = false) {
   if (!silent) showToast('↺ Posisi video direset ke tengah');
 }
 
-/* Hitung sisa ruang (overflow) akibat object-fit: cover.
-   Nilai > 0 berarti sumbu tersebut masih bisa digeser. */
 function getCoverOverflow(video, w, h) {
   const vw = video.videoWidth, vh = video.videoHeight;
   if (!vw || !vh || !w || !h) return null;
@@ -845,7 +844,7 @@ function getCoverOverflow(video, w, h) {
 
 const clamp01 = v => Math.min(1, Math.max(0, v));
 
-let pan = null;   // { pointerId, startX, startY, baseX, baseY, ovX, ovY }
+let pan = null;
 
 function onPanDown(e) {
   if (!state.uploadReady) return;
@@ -854,7 +853,7 @@ function onPanDown(e) {
   const rect = uploadVideo.getBoundingClientRect();
   const ov = getCoverOverflow(uploadVideo, rect.width, rect.height);
   if (!ov) return;
-  if (ov.x <= 0.5 && ov.y <= 0.5) return;   // video sudah pas, tidak perlu digeser
+  if (ov.x <= 0.5 && ov.y <= 0.5) return;
 
   pan = {
     pointerId: e.pointerId,
@@ -878,7 +877,6 @@ function onPanMove(e) {
   const dx = e.clientX - pan.startX;
   const dy = e.clientY - pan.startY;
 
-  /* Geser ke kanan  -> konten ikut ke kanan -> object-position X mengecil */
   const nx = pan.ovX > 0.5 ? pan.baseX - (dx / pan.ovX) : 0.5;
   const ny = pan.ovY > 0.5 ? pan.baseY - (dy / pan.ovY) : 0.5;
 
@@ -903,7 +901,6 @@ uploadVideo.addEventListener('pointerup', onPanUp);
 uploadVideo.addEventListener('pointercancel', onPanUp);
 uploadVideo.addEventListener('lostpointercapture', onPanUp);
 
-/* Double-tap / double-click pada video = reset posisi */
 let lastTapTime = 0;
 uploadVideo.addEventListener('pointerup', (e) => {
   if (!state.uploadReady) return;
@@ -921,7 +918,6 @@ btnResetPan.addEventListener('click', (e) => {
   resetUploadPosition();
 });
 
-/* Hint kecil "geser" muncul sebentar setelah upload */
 let panHintTimer;
 function showPanHint() {
   panHint.classList.add('show');
@@ -944,7 +940,6 @@ function drawCover(video, dx, dy, dw, dh, posX = 0.5, posY = 0.5) {
   }
   const vw = video.videoWidth, vh = video.videoHeight;
 
-  /* Sama persis dengan logika object-fit: cover + object-position */
   const scale = Math.max(dw / vw, dh / vh);
   const dispW = vw * scale;
   const dispH = vh * scale;
@@ -968,10 +963,8 @@ function startDrawLoop() {
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, W, H);
 
-    /* LIVE — selalu tengah */
     drawCover(liveVideo, 0, 0, W, splitY, 0.5, 0.5);
 
-    /* UPLOAD — pakai posisi manual dari user */
     drawCover(
       uploadVideo, 0, splitY, W, H - splitY,
       state.uploadPos.x, state.uploadPos.y
@@ -1100,8 +1093,6 @@ async function startCamera(silent = false) {
   }
 }
 
-/* Tunggu sampai video (live atau upload) punya dimensi — supaya
-   frame pertama rekaman tidak hitam total. */
 function waitForVideoDim(video, timeoutMs = 1500) {
   return new Promise((resolve) => {
     const start = Date.now();
@@ -1193,7 +1184,6 @@ fileInput.addEventListener('change', async (e) => {
     uploadPlaceholder.classList.add('hidden');
     state.uploadReady = true;
 
-    /* Video baru -> posisi kembali ke tengah */
     resetUploadPosition(true);
     btnResetPan.classList.remove('hidden');
 
@@ -1228,17 +1218,15 @@ fileInput.addEventListener('change', async (e) => {
 });
 
 /* ============================================================
-   REKAM — versi "rekam saat live" + kontrol playback aktif
+   REKAM — output 9:16
    ============================================================ */
 async function startRecording() {
   if (state.isRecording) return;
 
-  // 1) Pastikan kamera aktif (auto-start kalau belum) — "rekam saat live"
   if (!state.stream) {
-    await startCamera(true); // silent: toast rekam yang tampil
+    await startCamera(true);
   }
 
-  // 2) Minimal harus ada sesuatu untuk direkam
   if (!state.stream && !state.uploadReady) {
     showToast('Aktifkan kamera atau upload video dulu', 'error');
     return;
@@ -1249,7 +1237,6 @@ async function startRecording() {
 
   ensureAudioCtx();
 
-  // 3) Kalau ada video upload yang pause, play-kan otomatis
   if (state.uploadReady && uploadVideo.paused) {
     try {
       uploadVideo.muted = false;
@@ -1260,11 +1247,10 @@ async function startRecording() {
     }
   }
 
-  // 4) Tunggu live video punya frame (hindari frame hitam di awal)
   if (state.stream) await waitForVideoDim(liveVideo, 1500);
   if (state.uploadReady) await waitForVideoDim(uploadVideo, 1500);
 
-  // 5) Kunci ukuran canvas sesuai layout saat ini
+  /* ✅ Ukuran canvas di-set di sini → 9:16 (mis. 720×1280) */
   applyQuality(state.quality);
 
   const videoStream = canvas.captureStream(30);
@@ -1333,11 +1319,10 @@ async function startRecording() {
     state.timerInterval = setInterval(updateRecTimer, 500);
     updateRecTimer();
 
-    // ✅ Hanya kunci kontrol berbahaya — playback TETAP AKTIF
     RECORD_LOCKED_BTNS.forEach(b => b.disabled = true);
     RECORD_ACTIVE_BTNS.forEach(b => b.disabled = false);
 
-    showToast('🔴 Merekam — kontrol ▶ ⏸ ◀ ▶ ⏹ tetap aktif', 'success');
+    showToast('🔴 Merekam 9:16 — kontrol ▶ ⏸ ◀ ▶ ⏹ tetap aktif', 'success');
   } catch (err) {
     showToast('Rekam gagal: ' + err.message, 'error');
   }
@@ -1355,7 +1340,6 @@ function stopRecording() {
   btnRecord.classList.remove('recording');
   recText.textContent = 'Mulai Rekam';
 
-  // Buka kembali semua kontrol
   RECORD_LOCKED_BTNS.forEach(b => b.disabled = false);
   RECORD_ACTIVE_BTNS.forEach(b => b.disabled = false);
 }
@@ -1397,11 +1381,11 @@ async function saveToGallery() {
   const baseType = state.previewMime.split(';')[0];
   const ext = baseType.includes('mp4') ? 'mp4' : 'webm';
   const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
-  const file = new File([state.previewBlob], `split-${stamp}.${ext}`, { type: baseType });
+  const file = new File([state.previewBlob], `split-9x16-${stamp}.${ext}`, { type: baseType });
 
   if (navigator.canShare && navigator.canShare({ files: [file] })) {
     try {
-      await navigator.share({ files: [file], title: 'Split Screen Video' });
+      await navigator.share({ files: [file], title: 'Split Screen Video 9:16' });
       showToast('Tersimpan ke galeri', 'success');
       return;
     } catch (err) {
@@ -1419,7 +1403,7 @@ function downloadFile() {
   const url = URL.createObjectURL(state.previewBlob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `split-${stamp}.${ext}`;
+  a.download = `split-9x16-${stamp}.${ext}`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -1486,7 +1470,7 @@ applyQuality('720');
 requestAnimationFrame(() => applyQuality(state.quality));
 applyUploadPosition();
 updatePlayPauseIcon();
-console.log('%c📱 Split Screen Recorder — video upload bisa digeser manual', 'color:#6366f1;font-weight:bold;font-size:14px');
+console.log('%c📱 Split Screen Recorder — output 9:16 (720×1280 default)', 'color:#6366f1;font-weight:bold;font-size:14px');
 </script>
 
 </body>
