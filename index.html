@@ -71,21 +71,22 @@
     .screen-live   { flex: 0.8 1 0; }
     .screen-upload { flex: 1.2 1 0; }
 
+    /* ====== VIDEO: bebas digeser + di-zoom ====== */
     .screen video {
-      width: 100%; height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       object-fit: cover;
       background: #000;
       display: block;
-    }
-
-    /* ====== VIDEO UPLOAD: bisa digeser manual ====== */
-    .screen-upload video {
-      object-position: 50% 50%;
       touch-action: none;
       cursor: grab;
-      will-change: object-position;
+      will-change: width, height, left, top;
     }
-    .screen-upload video.grabbing { cursor: grabbing; }
+    .screen video.grabbing { cursor: grabbing; }
+    /* =============================================== */
 
     .pan-reset {
       position: absolute;
@@ -111,32 +112,143 @@
 
     .pan-hint {
       position: absolute;
-      right: 10px;
-      bottom: 54px;
-      padding: 5px 9px;
+      left: 50%;
+      bottom: 14px;
+      transform: translateX(-50%) translateY(6px);
+      padding: 6px 11px;
       border-radius: 999px;
       font-size: 10px;
       font-weight: 700;
       letter-spacing: 0.4px;
       color: #fff;
-      background: rgba(0,0,0,0.6);
+      background: rgba(0,0,0,0.65);
       border: 1px solid rgba(255,255,255,0.15);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       z-index: 7;
       pointer-events: none;
       opacity: 0;
-      transform: translateY(6px);
       transition: opacity 0.3s, transform 0.3s;
+      white-space: nowrap;
     }
-    .pan-hint.show { opacity: 1; transform: translateY(0); }
+    .pan-hint.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ====== TOOLS POJOK KANAN-BAWAH (posisi + zoom) ====== */
+    .screen-tools {
+      position: absolute;
+      right: 10px;
+      bottom: 12px;
+      z-index: 9;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      pointer-events: none;
+    }
+    .screen-tools > * { pointer-events: auto; }
+
+    .tool-toggle {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: transform 0.15s, background 0.2s;
+    }
+    .tool-toggle svg { width: 16px; height: 16px; }
+    .tool-toggle:active { transform: scale(0.9); }
+    .tool-toggle.open { background: rgba(99,102,241,0.85); border-color: transparent; }
+
+    .tool-panel {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      padding: 10px;
+      border-radius: 14px;
+      background: rgba(12,12,16,0.92);
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.55);
+      animation: modalIn 0.18s ease;
+    }
+    .tool-panel.open { display: flex; }
+
+    .pos-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      width: 96px;
+    }
+    .pos-grid button {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: background 0.15s;
+    }
+    .pos-grid button::after {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.35);
+      transition: background 0.2s, transform 0.2s;
+    }
+    .pos-grid button:hover { background: rgba(255,255,255,0.15); }
+    .pos-grid button.active { background: rgba(99,102,241,0.25); border-color: rgba(99,102,241,0.6); }
+    .pos-grid button.active::after { background: var(--accent); transform: scale(1.5); }
+
+    .tool-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .tool-row button {
+      width: 26px; height: 26px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.12s, background 0.2s;
+    }
+    .tool-row button:hover { background: rgba(255,255,255,0.15); }
+    .tool-row button:active { transform: scale(0.9); }
+    .tool-row button svg { width: 13px; height: 13px; }
+    .zoom-label {
+      flex: 1;
+      text-align: center;
+      font-size: 10px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      color: rgba(255,255,255,0.8);
+      letter-spacing: 0.3px;
+    }
     /* =============================================== */
 
     /* ====== DIVIDER (bisa di-drag 0%–100%) ====== */
     .divider {
       flex: 0 0 2px;
       background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-      z-index: 3;
+      z-index: 20;
       position: relative;
       cursor: ns-resize;
       touch-action: none;
@@ -217,13 +329,14 @@
       font-weight: 800;
       letter-spacing: 0.8px;
       color: #fff;
-      z-index: 4;
+      z-index: 10;
       display: inline-flex;
       align-items: center;
       gap: 5px;
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(255,255,255,0.15);
+      pointer-events: none;
     }
     .badge.live { background: rgba(239,68,68,0.85); }
     .badge.live .dot {
@@ -283,7 +396,7 @@
       padding: 20px;
       pointer-events: none;
       transition: opacity 0.3s;
-      z-index: 2;
+      z-index: 5;
     }
     .placeholder svg {
       width: 40px; height: 40px;
@@ -299,7 +412,7 @@
       bottom: 0; left: 0; right: 0;
       height: 3px;
       background: rgba(255,255,255,0.12);
-      z-index: 6;
+      z-index: 12;
       cursor: pointer;
       transition: height 0.2s;
     }
@@ -320,7 +433,7 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
-      z-index: 10;
+      z-index: 25;
     }
 
     .ctrl-row {
@@ -379,6 +492,39 @@
       color: var(--green);
     }
     .pill.icon-only { padding: 8px; width: 34px; justify-content: center; }
+
+    /* ====== SPLIT PRESETS ====== */
+    .split-row {
+      gap: 6px;
+      padding: 0 2px;
+    }
+    .split-label {
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin-right: 2px;
+    }
+    .split-btn {
+      flex: 1 1 0;
+      padding: 7px 2px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 10px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      cursor: pointer;
+      transition: transform 0.15s, background 0.2s, border-color 0.2s, color 0.2s;
+    }
+    .split-btn:hover { background: var(--surface-hover); }
+    .split-btn:active { transform: scale(0.94); }
+    .split-btn.active {
+      background: rgba(99,102,241,0.2);
+      border-color: rgba(99,102,241,0.55);
+      color: #c7c9ff;
+    }
 
     .record-btn {
       width: 100%;
@@ -529,7 +675,7 @@
 
     .toast {
       position: fixed;
-      bottom: calc(220px + var(--safe-bottom));
+      bottom: calc(240px + var(--safe-bottom));
       left: 50%;
       transform: translateX(-50%) translateY(20px);
       background: rgba(30,30,35,0.98);
@@ -585,6 +731,7 @@
       .circle-btn.primary { width: 46px; height: 46px; }
       .pill { padding: 7px 10px; font-size: 10px; }
       .record-btn { padding: 12px; font-size: 13px; }
+      .split-btn { padding: 6px 2px; font-size: 9px; }
     }
   </style>
 </head>
@@ -593,6 +740,7 @@
 <div class="app">
   <div class="phone-frame">
 
+    <!-- ================= LIVE ================= -->
     <div class="screen screen-live" id="liveScreen">
       <span class="badge live">
         <span class="dot"></span>
@@ -606,12 +754,42 @@
         </svg>
         <span>Kamera belum aktif</span>
       </div>
+
+      <div class="pan-hint" id="liveHint">✋ Geser · cubit untuk zoom</div>
+
+      <div class="screen-tools hidden" id="liveTools">
+        <div class="tool-panel" data-panel>
+          <div class="pos-grid" data-grid></div>
+          <div class="tool-row">
+            <button type="button" data-zoom="-" title="Zoom out">−</button>
+            <span class="zoom-label" data-zoom-label>1.0×</span>
+            <button type="button" data-zoom="+" title="Zoom in">+</button>
+            <button type="button" data-reset title="Reset tampilan">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 12a9 9 0 1 0 3-6.7"/>
+                <polyline points="3 4 3 10 9 10"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <button class="tool-toggle" type="button" data-toggle title="Atur posisi & zoom">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="5 9 2 12 5 15"/>
+            <polyline points="9 5 12 2 15 5"/>
+            <polyline points="15 19 12 22 9 19"/>
+            <polyline points="19 9 22 12 19 15"/>
+            <line x1="2" y1="12" x2="22" y2="12"/>
+            <line x1="12" y1="2" x2="12" y2="22"/>
+          </svg>
+        </button>
+      </div>
     </div>
 
     <div class="divider" id="divider" title="Geser untuk atur ukuran LIVE / UPLOAD (0%–100%)">
       <span class="split-pct" id="splitPct">40% / 60%</span>
     </div>
 
+    <!-- ================= UPLOAD ================= -->
     <div class="screen screen-upload" id="uploadScreen">
       <span class="badge upload">
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
@@ -628,20 +806,37 @@
           <polyline points="17 8 12 3 7 8"/>
           <line x1="12" y1="3" x2="12" y2="15"/>
         </svg>
-        <span>Upload video dari galeri HP<br>lalu geser untuk atur posisi</span>
+        <span>Upload video dari galeri HP<br>lalu geser / cubit untuk atur</span>
       </div>
 
-      <div class="pan-hint" id="panHint">✋ Geser untuk atur posisi</div>
+      <div class="pan-hint" id="uploadHint">✋ Geser · cubit untuk zoom</div>
 
-      <button class="pan-reset hidden" id="btnResetPan" title="Reset posisi video">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="3"/>
-          <line x1="12" y1="2" x2="12" y2="6"/>
-          <line x1="12" y1="18" x2="12" y2="22"/>
-          <line x1="2" y1="12" x2="6" y2="12"/>
-          <line x1="18" y1="12" x2="22" y2="12"/>
-        </svg>
-      </button>
+      <div class="screen-tools hidden" id="uploadTools">
+        <div class="tool-panel" data-panel>
+          <div class="pos-grid" data-grid></div>
+          <div class="tool-row">
+            <button type="button" data-zoom="-" title="Zoom out">−</button>
+            <span class="zoom-label" data-zoom-label>1.0×</span>
+            <button type="button" data-zoom="+" title="Zoom in">+</button>
+            <button type="button" data-reset title="Reset tampilan">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 12a9 9 0 1 0 3-6.7"/>
+                <polyline points="3 4 3 10 9 10"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <button class="tool-toggle" type="button" data-toggle title="Atur posisi & zoom">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="5 9 2 12 5 15"/>
+            <polyline points="9 5 12 2 15 5"/>
+            <polyline points="15 19 12 22 9 19"/>
+            <polyline points="19 9 22 12 19 15"/>
+            <line x1="2" y1="12" x2="22" y2="12"/>
+            <line x1="12" y1="2" x2="12" y2="22"/>
+          </svg>
+        </button>
+      </div>
 
       <div class="video-progress" id="videoProgress">
         <div class="video-progress-fill" id="videoProgressFill"></div>
@@ -716,6 +911,15 @@
         </button>
       </div>
 
+      <div class="ctrl-row split-row">
+        <span class="split-label">SPLIT</span>
+        <button class="split-btn" data-split="0">0%</button>
+        <button class="split-btn" data-split="0.3">30%</button>
+        <button class="split-btn" data-split="0.5">50%</button>
+        <button class="split-btn" data-split="0.7">70%</button>
+        <button class="split-btn" data-split="1">100%</button>
+      </div>
+
       <button class="record-btn" id="btnRecord">
         <span class="rec-indicator"></span>
         <span class="rec-text">Mulai Rekam</span>
@@ -786,6 +990,10 @@ const DEFAULT_SPLIT = 0.40;
 const MIN_SPLIT = 0.0;
 const MAX_SPLIT = 1.0;
 
+/* ✅ Zoom bebas 1× – 6× */
+const MIN_ZOOM = 1;
+const MAX_ZOOM = 6;
+
 const TARGET_ASPECT = 16 / 9;
 
 /* ============================================================
@@ -800,7 +1008,11 @@ const state = {
   recStartTime: 0, timerInterval: null, drawRAF: null,
   quality: '720',
   splitRatio: DEFAULT_SPLIT,
-  uploadPos: { x: 0.5, y: 0.5 },
+  /* ✅ posisi + zoom tiap video (panX/panY 0..1 → 0=ujung, 0.5=tengah, 1=ujung lain) */
+  views: {
+    live:   { zoom: 1, panX: 0.5, panY: 0.5 },
+    upload: { zoom: 1, panX: 0.5, panY: 0.5 }
+  },
   previewBlob: null, previewUrl: null, previewMime: ''
 };
 
@@ -832,8 +1044,6 @@ const btnSaveGallery    = $('btnSaveGallery');
 const btnDownload       = $('btnDownload');
 const qualityLabel      = $('qualityLabel');
 const recText           = btnRecord.querySelector('.rec-text');
-const btnResetPan       = $('btnResetPan');
-const panHint           = $('panHint');
 const splitPct          = $('splitPct');
 
 const btnPlayPause      = $('btnPlayPause');
@@ -853,6 +1063,286 @@ const RECORD_ACTIVE_BTNS = [btnPlayPause, btnBack, btnNext, btnStop];
 
 const ICON_PLAY  = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
 const ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>';
+
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const clamp01 = v => Math.min(1, Math.max(0, v));
+
+/* ============================================================
+   CONTROLLER TIAP LAYAR (LIVE & UPLOAD)
+   ============================================================ */
+const VIEW_CTRL = [
+  {
+    key: 'live', screen: liveScreen, video: liveVideo,
+    tools: $('liveTools'), hint: $('liveHint'),
+    isReady: () => !!state.stream && liveVideo.videoWidth > 0
+  },
+  {
+    key: 'upload', screen: uploadScreen, video: uploadVideo,
+    tools: $('uploadTools'), hint: $('uploadHint'),
+    isReady: () => state.uploadReady && uploadVideo.videoWidth > 0
+  }
+];
+const ctrlByKey = Object.fromEntries(VIEW_CTRL.map(c => [c.key, c]));
+
+/* ============================================================
+   HITUNG GEOMETRI "COVER" (dipakai CSS & canvas → WYSIWYG)
+   ============================================================ */
+function getFitInfo(videoEl, screenEl) {
+  const vw = videoEl.videoWidth || 0;
+  const vh = videoEl.videoHeight || 0;
+  const cw = screenEl.clientWidth;
+  const ch = screenEl.clientHeight;
+  if (!vw || !vh || !cw || !ch) return null;
+  const s0 = Math.max(cw / vw, ch / vh);
+  return { vw, vh, cw, ch, s0 };
+}
+
+/* Terapkan posisi + zoom ke elemen <video> */
+function applyView(ctrl) {
+  const vs = state.views[ctrl.key];
+  const info = getFitInfo(ctrl.video, ctrl.screen);
+  if (!info) return;
+
+  const { vw, vh, cw, ch, s0 } = info;
+  const z = clamp(vs.zoom, MIN_ZOOM, MAX_ZOOM);
+  const W = vw * s0 * z;
+  const H = vh * s0 * z;
+
+  ctrl.video.style.width  = W.toFixed(2) + 'px';
+  ctrl.video.style.height = H.toFixed(2) + 'px';
+  ctrl.video.style.left   = (-vs.panX * (W - cw)).toFixed(2) + 'px';
+  ctrl.video.style.top    = (-vs.panY * (H - ch)).toFixed(2) + 'px';
+
+  if (ctrl.zoomLabel) ctrl.zoomLabel.textContent = z.toFixed(1) + '×';
+}
+
+function applyAllViews() {
+  VIEW_CTRL.forEach(applyView);
+}
+
+function resetView(ctrl, silent = false) {
+  const vs = state.views[ctrl.key];
+  vs.zoom = 1;
+  vs.panX = 0.5;
+  vs.panY = 0.5;
+  applyView(ctrl);
+  updateGridActive(ctrl);
+  if (!silent) showToast('↺ Tampilan direset ke tengah');
+}
+
+/* ============================================================
+   TOOLS: 3×3 PRESET POSISI + ZOOM
+   ============================================================ */
+function updateGridActive(ctrl) {
+  if (!ctrl.tools) return;
+  const vs = state.views[ctrl.key];
+  ctrl.tools.querySelectorAll('[data-grid] button').forEach(b => {
+    const px = parseFloat(b.dataset.px);
+    const py = parseFloat(b.dataset.py);
+    b.classList.toggle('active',
+      Math.abs(px - vs.panX) < 0.02 && Math.abs(py - vs.panY) < 0.02
+    );
+  });
+}
+
+function initTools(ctrl) {
+  if (!ctrl.tools) return;
+
+  const panel  = ctrl.tools.querySelector('[data-panel]');
+  const grid   = ctrl.tools.querySelector('[data-grid]');
+  const toggle = ctrl.tools.querySelector('[data-toggle]');
+  ctrl.zoomLabel = ctrl.tools.querySelector('[data-zoom-label]');
+
+  /* Buat 9 tombol posisi (kiri-tengah-kanan × atas-tengah-bawah) */
+  [0, 0.5, 1].forEach(py => {
+    [0, 0.5, 1].forEach(px => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.dataset.px = px;
+      b.dataset.py = py;
+      b.title = `Posisi ${Math.round(px * 100)}% / ${Math.round(py * 100)}%`;
+      b.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const vs = state.views[ctrl.key];
+        vs.panX = px;
+        vs.panY = py;
+        applyView(ctrl);
+        updateGridActive(ctrl);
+      });
+      grid.appendChild(b);
+    });
+  });
+
+  toggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const open = panel.classList.toggle('open');
+    toggle.classList.toggle('open', open);
+  });
+
+  /* Tutup panel kalau tap di luar */
+  document.addEventListener('pointerdown', (e) => {
+    if (!panel.classList.contains('open')) return;
+    if (ctrl.tools.contains(e.target)) return;
+    panel.classList.remove('open');
+    toggle.classList.remove('open');
+  }, { passive: true });
+
+  ctrl.tools.querySelectorAll('[data-zoom]').forEach(b => {
+    b.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const vs = state.views[ctrl.key];
+      const f = b.dataset.zoom === '+' ? 1.25 : 0.8;
+      vs.zoom = clamp(vs.zoom * f, MIN_ZOOM, MAX_ZOOM);
+      applyView(ctrl);
+    });
+  });
+
+  ctrl.tools.querySelector('[data-reset]').addEventListener('click', (e) => {
+    e.stopPropagation();
+    resetView(ctrl);
+  });
+
+  updateGridActive(ctrl);
+}
+
+/* ============================================================
+   GESTURE: GESER (PAN) + CUBIT (ZOOM) + DOUBLE-TAP RESET
+   ============================================================ */
+function showHint(ctrl) {
+  if (!ctrl.hint) return;
+  ctrl.hint.classList.add('show');
+  clearTimeout(ctrl._hintTimer);
+  ctrl._hintTimer = setTimeout(() => ctrl.hint.classList.remove('show'), 3400);
+}
+function hideHint(ctrl) {
+  if (!ctrl.hint) return;
+  clearTimeout(ctrl._hintTimer);
+  ctrl.hint.classList.remove('show');
+}
+
+function setupGestures(ctrl) {
+  const el = ctrl.video;
+  const pts = new Map();
+  let gesture = null;
+  let lastTap = 0;
+
+  el.addEventListener('pointerdown', (e) => {
+    if (!ctrl.isReady()) return;
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+
+    pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    try { el.setPointerCapture(e.pointerId); } catch (_) {}
+
+    if (pts.size === 1) {
+      const vs = state.views[ctrl.key];
+      gesture = {
+        type: 'pan',
+        startX: e.clientX,
+        startY: e.clientY,
+        baseX: vs.panX,
+        baseY: vs.panY,
+        time: Date.now(),
+        moved: false
+      };
+    } else if (pts.size === 2) {
+      const arr = [...pts.values()];
+      const d = Math.hypot(arr[0].x - arr[1].x, arr[0].y - arr[1].y);
+      gesture = {
+        type: 'pinch',
+        startDist: Math.max(1, d),
+        baseZoom: state.views[ctrl.key].zoom
+      };
+    }
+
+    el.classList.add('grabbing');
+    hideHint(ctrl);
+    e.preventDefault();
+  });
+
+  el.addEventListener('pointermove', (e) => {
+    if (!pts.has(e.pointerId) || !gesture) return;
+    pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    const vs = state.views[ctrl.key];
+
+    if (gesture.type === 'pan' && pts.size === 1) {
+      const dx = e.clientX - gesture.startX;
+      const dy = e.clientY - gesture.startY;
+      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) gesture.moved = true;
+
+      const info = getFitInfo(el, ctrl.screen);
+      if (!info) return;
+      const W = info.vw * info.s0 * vs.zoom;
+      const H = info.vh * info.s0 * vs.zoom;
+      const maxX = W - info.cw;
+      const maxY = H - info.ch;
+
+      if (maxX > 0.5) vs.panX = clamp01(gesture.baseX - dx / maxX);
+      if (maxY > 0.5) vs.panY = clamp01(gesture.baseY - dy / maxY);
+
+      applyView(ctrl);
+      updateGridActive(ctrl);
+
+    } else if (gesture.type === 'pinch' && pts.size === 2) {
+      const arr = [...pts.values()];
+      const d = Math.hypot(arr[0].x - arr[1].x, arr[0].y - arr[1].y);
+      vs.zoom = clamp(gesture.baseZoom * (d / gesture.startDist), MIN_ZOOM, MAX_ZOOM);
+      applyView(ctrl);
+    }
+
+    e.preventDefault();
+  });
+
+  const endPointer = (e) => {
+    if (!pts.has(e.pointerId)) return;
+
+    const wasPan = gesture && gesture.type === 'pan';
+    const moved  = gesture && gesture.moved;
+    const time   = gesture && gesture.time;
+
+    pts.delete(e.pointerId);
+    try { el.releasePointerCapture(e.pointerId); } catch (_) {}
+
+    if (pts.size === 0) {
+      gesture = null;
+      el.classList.remove('grabbing');
+    }
+
+    /* Double-tap = reset tampilan */
+    if (wasPan && !moved && Date.now() - time < 300) {
+      const now = Date.now();
+      if (now - lastTap < 320) {
+        resetView(ctrl);
+        lastTap = 0;
+      } else {
+        lastTap = now;
+      }
+    }
+  };
+
+  el.addEventListener('pointerup', endPointer);
+  el.addEventListener('pointercancel', endPointer);
+  el.addEventListener('lostpointercapture', endPointer);
+
+  /* Zoom pakai scroll (desktop) */
+  el.addEventListener('wheel', (e) => {
+    if (!ctrl.isReady()) return;
+    e.preventDefault();
+    const vs = state.views[ctrl.key];
+    const factor = Math.exp(-e.deltaY * 0.0015);
+    vs.zoom = clamp(vs.zoom * factor, MIN_ZOOM, MAX_ZOOM);
+    applyView(ctrl);
+  }, { passive: false });
+}
+
+VIEW_CTRL.forEach(ctrl => {
+  initTools(ctrl);
+  setupGestures(ctrl);
+});
+
+/* Re-apply saat metadata video siap */
+liveVideo.addEventListener('loadedmetadata', () => applyView(ctrlByKey.live));
+uploadVideo.addEventListener('loadedmetadata', () => applyView(ctrlByKey.upload));
 
 /* ============================================================
    CANVAS — OUTPUT DIPAKSA 9:16
@@ -895,12 +1385,21 @@ function applySplitToLayout() {
   liveScreen.style.flex   = `${r} 1 0`;
   uploadScreen.style.flex = `${1 - r} 1 0`;
   updateSplitPct();
+  updateSplitPresets();
+  requestAnimationFrame(applyAllViews);
 }
 
 function updateSplitPct() {
   const live = Math.round(state.splitRatio * 100);
   const up   = 100 - live;
   splitPct.textContent = `${live}% / ${up}%`;
+}
+
+function updateSplitPresets() {
+  document.querySelectorAll('.split-btn').forEach(b => {
+    const v = parseFloat(b.dataset.split);
+    b.classList.toggle('active', Math.abs(v - state.splitRatio) < 0.012);
+  });
 }
 
 let splitDrag = null;
@@ -949,7 +1448,7 @@ divider.addEventListener('lostpointercapture', onDivUp);
 
 /* Double-tap divider → reset 50 / 50 */
 let divLastTap = 0;
-divider.addEventListener('pointerup', (e) => {
+divider.addEventListener('pointerup', () => {
   const now = Date.now();
   if (now - divLastTap < 300) {
     state.splitRatio = 0.5;
@@ -961,140 +1460,36 @@ divider.addEventListener('pointerup', (e) => {
   }
 });
 
-/* ============================================================
-   POSISI MANUAL VIDEO UPLOAD (PAN / GESER)
-   ============================================================ */
-function applyUploadPosition() {
-  const p = state.uploadPos;
-  uploadVideo.style.objectPosition = `${(p.x * 100).toFixed(3)}% ${(p.y * 100).toFixed(3)}%`;
-}
-
-function resetUploadPosition(silent = false) {
-  state.uploadPos.x = 0.5;
-  state.uploadPos.y = 0.5;
-  applyUploadPosition();
-  if (!silent) showToast('↺ Posisi video direset ke tengah');
-}
-
-function getCoverOverflow(video, w, h) {
-  const vw = video.videoWidth, vh = video.videoHeight;
-  if (!vw || !vh || !w || !h) return null;
-  const scale = Math.max(w / vw, h / vh);
-  return {
-    x: Math.max(0, vw * scale - w),
-    y: Math.max(0, vh * scale - h)
-  };
-}
-
-const clamp01 = v => Math.min(1, Math.max(0, v));
-
-let pan = null;
-
-function onPanDown(e) {
-  if (!state.uploadReady) return;
-  if (e.button !== undefined && e.button !== 0 && e.pointerType === 'mouse') return;
-
-  const rect = uploadVideo.getBoundingClientRect();
-  const ov = getCoverOverflow(uploadVideo, rect.width, rect.height);
-  if (!ov) return;
-  if (ov.x <= 0.5 && ov.y <= 0.5) return;
-
-  pan = {
-    pointerId: e.pointerId,
-    startX: e.clientX,
-    startY: e.clientY,
-    baseX: state.uploadPos.x,
-    baseY: state.uploadPos.y,
-    ovX: ov.x,
-    ovY: ov.y
-  };
-
-  try { uploadVideo.setPointerCapture(e.pointerId); } catch (err) {}
-  uploadVideo.classList.add('grabbing');
-  hidePanHint();
-  e.preventDefault();
-}
-
-function onPanMove(e) {
-  if (!pan || e.pointerId !== pan.pointerId) return;
-
-  const dx = e.clientX - pan.startX;
-  const dy = e.clientY - pan.startY;
-
-  const nx = pan.ovX > 0.5 ? pan.baseX - (dx / pan.ovX) : 0.5;
-  const ny = pan.ovY > 0.5 ? pan.baseY - (dy / pan.ovY) : 0.5;
-
-  state.uploadPos.x = clamp01(nx);
-  state.uploadPos.y = clamp01(ny);
-  applyUploadPosition();
-
-  e.preventDefault();
-}
-
-function onPanUp(e) {
-  if (!pan) return;
-  if (e && e.pointerId !== undefined && e.pointerId !== pan.pointerId) return;
-  try { uploadVideo.releasePointerCapture(pan.pointerId); } catch (err) {}
-  pan = null;
-  uploadVideo.classList.remove('grabbing');
-}
-
-uploadVideo.addEventListener('pointerdown', onPanDown);
-uploadVideo.addEventListener('pointermove', onPanMove);
-uploadVideo.addEventListener('pointerup', onPanUp);
-uploadVideo.addEventListener('pointercancel', onPanUp);
-uploadVideo.addEventListener('lostpointercapture', onPanUp);
-
-let lastTapTime = 0;
-uploadVideo.addEventListener('pointerup', (e) => {
-  if (!state.uploadReady) return;
-  const now = Date.now();
-  if (now - lastTapTime < 300) {
-    resetUploadPosition();
-    lastTapTime = 0;
-  } else {
-    lastTapTime = now;
-  }
+/* Tombol preset split */
+document.querySelectorAll('.split-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    state.splitRatio = parseFloat(b.dataset.split);
+    applySplitToLayout();
+    const live = Math.round(state.splitRatio * 100);
+    showToast(`📐 Split ${live}% / ${100 - live}%`);
+  });
 });
 
-btnResetPan.addEventListener('click', (e) => {
-  e.stopPropagation();
-  resetUploadPosition();
-});
-
-let panHintTimer;
-function showPanHint() {
-  panHint.classList.add('show');
-  clearTimeout(panHintTimer);
-  panHintTimer = setTimeout(hidePanHint, 3200);
-}
-function hidePanHint() {
-  clearTimeout(panHintTimer);
-  panHint.classList.remove('show');
-}
-
 /* ============================================================
-   DRAW COVER (aman saat dw/dh = 0)
+   DRAW — replikasi persis transform CSS ke canvas
    ============================================================ */
-function drawCover(video, dx, dy, dw, dh, posX = 0.5, posY = 0.5) {
+function drawVideoCover(video, viewState, dx, dy, dw, dh) {
   if (dw <= 0 || dh <= 0) return;          // ← guard: layar 0% tidak digambar
-  if (!video || !video.videoWidth || !video.videoHeight) {
+
+  const vw = video.videoWidth, vh = video.videoHeight;
+  if (!vw || !vh) {
     ctx.fillStyle = '#0d0d0f';
     ctx.fillRect(dx, dy, dw, dh);
     return;
   }
-  const vw = video.videoWidth, vh = video.videoHeight;
 
-  const scale = Math.max(dw / vw, dh / vh);
-  const dispW = vw * scale;
-  const dispH = vh * scale;
-  const overX = Math.max(0, dispW - dw);
-  const overY = Math.max(0, dispH - dh);
+  const s0 = Math.max(dw / vw, dh / vh);
+  const z  = clamp(viewState.zoom, MIN_ZOOM, MAX_ZOOM);
 
-  const sw = Math.min(vw, dw / scale);
-  const sh = Math.min(vh, dh / scale);
-  const sx = (posX * overX) / scale;
-  const sy = (posY * overY) / scale;
+  const sw = dw / (s0 * z);
+  const sh = dh / (s0 * z);
+  const sx = viewState.panX * (vw - sw);
+  const sy = viewState.panY * (vh - sh);
 
   try { ctx.drawImage(video, sx, sy, sw, sh, dx, dy, dw, dh); } catch (e) {}
 }
@@ -1108,11 +1503,10 @@ function startDrawLoop() {
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, W, H);
 
-    drawCover(liveVideo, 0, 0, W, splitY, 0.5, 0.5);
+    drawVideoCover(liveVideo, state.views.live, 0, 0, W, splitY);
 
-    drawCover(
-      uploadVideo, 0, splitY, W, H - splitY,
-      state.uploadPos.x, state.uploadPos.y
+    drawVideoCover(
+      uploadVideo, state.views.upload, 0, splitY, W, H - splitY
     );
 
     /* Garis pemisah hanya jika kedua sisi masih terlihat */
@@ -1233,6 +1627,13 @@ async function startCamera(silent = false) {
     livePlaceholder.classList.add('hidden');
     btnSwitchCam.classList.remove('hidden');
     btnStartCam.classList.add('active');
+
+    /* Tampilkan tools posisi/zoom live */
+    const c = ctrlByKey.live;
+    if (c.tools) c.tools.classList.remove('hidden');
+    resetView(c, true);
+    showHint(c);
+
     if (!silent) showToast('Kamera aktif', 'success');
     return true;
   } catch (err) {
@@ -1332,8 +1733,10 @@ fileInput.addEventListener('change', async (e) => {
     uploadPlaceholder.classList.add('hidden');
     state.uploadReady = true;
 
-    resetUploadPosition(true);
-    btnResetPan.classList.remove('hidden');
+    /* Reset tampilan & tampilkan tools */
+    const c = ctrlByKey.upload;
+    resetView(c, true);
+    if (c.tools) c.tools.classList.remove('hidden');
 
     ensureAudioCtx();
     try {
@@ -1348,14 +1751,14 @@ fileInput.addEventListener('change', async (e) => {
     try {
       uploadVideo.muted = false;
       await uploadVideo.play();
-      showToast('Video dimuat — geser untuk atur posisi', 'success');
+      showToast('Video dimuat — geser / cubit untuk atur', 'success');
     } catch (autoplayErr) {
       uploadVideo.muted = true;
       try { await uploadVideo.play(); } catch(e) {}
       showToast('Video dimuat — ketuk ▶ untuk audio', '');
     }
 
-    showPanHint();
+    showHint(c);
     updatePlayPauseIcon();
     updateProgressBar();
   } catch (err) {
@@ -1469,7 +1872,7 @@ async function startRecording() {
     RECORD_LOCKED_BTNS.forEach(b => b.disabled = true);
     RECORD_ACTIVE_BTNS.forEach(b => b.disabled = false);
 
-    showToast('🔴 Merekam 9:16 — drag divider untuk atur split', 'success');
+    showToast('🔴 Merekam 9:16 — geser divider / atur posisi bebas', 'success');
   } catch (err) {
     showToast('Rekam gagal: ' + err.message, 'error');
   }
@@ -1592,15 +1995,23 @@ btnDownload.addEventListener('click', downloadFile);
    ============================================================ */
 let resizeTimeout;
 function handleResize() {
-  if (state.isRecording) return;
+  if (state.isRecording) { applyAllViews(); return; }
   clearTimeout(resizeTimeout);
   resizeTimeout = setTimeout(() => {
     applySplitToLayout();
     applyQuality(state.quality);
+    applyAllViews();
   }, 150);
 }
 window.addEventListener('resize', handleResize);
 window.addEventListener('orientationchange', handleResize);
+
+/* Re-apply saat ukuran layar split berubah (mis. karena divider) */
+if (window.ResizeObserver) {
+  const ro = new ResizeObserver(() => applyAllViews());
+  ro.observe(liveScreen);
+  ro.observe(uploadScreen);
+}
 
 /* ============================================================
    CLEANUP
@@ -1620,10 +2031,11 @@ applyQuality('720');
 requestAnimationFrame(() => {
   applySplitToLayout();
   applyQuality(state.quality);
+  applyAllViews();
 });
-applyUploadPosition();
 updatePlayPauseIcon();
-console.log('%c📱 Split Screen Recorder — split 0%–100% | output 9:16', 'color:#6366f1;font-weight:bold;font-size:14px');
+console.log('%c📱 Split Screen Recorder — split 0%–100% | posisi & zoom bebas | output 9:16',
+  'color:#6366f1;font-weight:bold;font-size:14px');
 </script>
 
 </body>
